@@ -13,4 +13,8 @@ class SubAccount:
     username_encrypted: Optional[str] = None
     email_encrypted: Optional[str] = None
     site_link_encrypted: Optional[str] = None
+    # AES-GCM(team key) wrap of this row's own data key; the *_encrypted
+    # fields above are AES-GCM(that data key), not AES-GCM(team key) directly.
+    # Optional so rotating the team key never blocks on legacy rows.
+    dek_wrapped: Optional[str] = None
     id: Optional[uuid.UUID] = None

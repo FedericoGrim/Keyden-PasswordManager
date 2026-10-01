@@ -7,3 +7,4 @@ from domain.entities.user_teams_keys import UserTeamsKeys
 from domain.entities.categories import Categories
 from domain.entities.sub_account_categories import SubAccountCategories
 from domain.entities.user_favorite import UserFavorite
+from domain.entities.sub_account_history import SubAccountHistory

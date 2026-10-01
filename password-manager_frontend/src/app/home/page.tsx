@@ -18,7 +18,7 @@ import {
 import { team } from "@/api/entities/team";
 import { teamPermLevel } from "@/api/entities/teamPermLevel";
 import { category } from "@/api/entities/category";
-import { unwrapTeamKey, decrypt } from "@/Functions/Cripting-Decripting/Cript-Dectipr";
+import { unwrapTeamKey, importAesKey, decryptSubAccountFields } from "@/Functions/Cripting-Decripting/Cript-Dectipr";
 import SubAccountForm, { DecryptedSubAccount } from "../teams/[teamId]/page-components/subAccountForm/subAccountForm";
 
 import "./styles.css";
@@ -54,7 +54,7 @@ export default function Home() {
       if (!match) return null;
 
       const raw = await unwrapTeamKey(match.team_key_encrypted, vault.privateKeyEc, vault.privateKeyPq);
-      const aesKey = await crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["encrypt", "decrypt"]);
+      const aesKey = await importAesKey(raw);
       teamKeyCache.current.set(teamId, aesKey);
       return aesKey;
     },
@@ -88,11 +88,9 @@ export default function Home() {
         return {
           id: sa.id,
           teamId: sa.team_id,
-          username: await decrypt(sa.username_encrypted, aesKey),
-          email: await decrypt(sa.email_encrypted, aesKey),
-          password: await decrypt(sa.password_encrypted, aesKey),
-          siteLink: await decrypt(sa.site_link_encrypted, aesKey),
+          ...(await decryptSubAccountFields(sa, aesKey)),
           requiredPermLevelId: sa.required_perm_level_id,
+          dekWrapped: sa.dek_wrapped,
         } as FavoriteCard;
       })
     );
@@ -107,11 +105,9 @@ export default function Home() {
       const decrypted = await Promise.all(
         raw.map(async (sa) => ({
           id: sa.id,
-          username: await decrypt(sa.username_encrypted, aesKey),
-          email: await decrypt(sa.email_encrypted, aesKey),
-          password: await decrypt(sa.password_encrypted, aesKey),
-          siteLink: await decrypt(sa.site_link_encrypted, aesKey),
+          ...(await decryptSubAccountFields(sa, aesKey)),
           requiredPermLevelId: sa.required_perm_level_id,
+          dekWrapped: sa.dek_wrapped,
         }))
       );
       setGridAccounts(decrypted);

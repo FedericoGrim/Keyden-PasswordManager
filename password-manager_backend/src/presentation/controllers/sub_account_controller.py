@@ -7,7 +7,7 @@ from config import Container
 
 from infrastructure.databases.database import get_db
 
-from application.dto.sub_account_dto import CreateSubAccountDTO, UpdateSubAccountDTO, SubAccountDTO, DeleteSubAccountDTO
+from application.dto.sub_account_dto import CreateSubAccountDTO, UpdateSubAccountDTO, SubAccountDTO, DeleteSubAccountDTO, RotateSubAccountDeksDTO
 
 router = APIRouter()
 
@@ -67,18 +67,20 @@ async def GetAllSubAccountsByTeamId(
 
 @router.put("/{subaccount_id}")
 async def UpdateSubAccountById(
-    subaccount_id: uuid.UUID, 
-    updated_data: UpdateSubAccountDTO, 
+    interactor_id: uuid.UUID,
+    subaccount_id: uuid.UUID,
+    updated_data: UpdateSubAccountDTO,
     request: Request,
-    db: Session = Depends(get_db), 
+    db: Session = Depends(get_db),
 ):
     container: Container = request.app.state.container
     update_subaccount_use_case = container.subaccount().UpdateSubAccountByIdProvider(
         SubAccountRepository__db=db,
+        SubAccountHistoryRepository__db=db,
     )
 
     try:
-        if update_subaccount_use_case.execute( subaccount_id, updated_data):
+        if update_subaccount_use_case.execute(interactor_id, updated_data):
             return {"message": "SubAccount updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -99,5 +101,24 @@ async def DeleteSubAccount(
     try:
         if delete_subaccount_use_case.execute(interactor_id, delete_dto):
             return {"message": "SubAccount deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.put("/team/{team_id}/rotate-deks")
+async def RotateSubAccountDeks(
+    interactor_id: uuid.UUID,
+    team_id: uuid.UUID,
+    rotation: RotateSubAccountDeksDTO,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    container: Container = request.app.state.container
+    rotate_deks_use_case = container.subaccount().RotateSubAccountDeksProvider(
+        SubAccountRepository__db=db,
+        SubAccountHistoryRepository__db=db,
+    )
+
+    try:
+        return rotate_deks_use_case.execute(interactor_id, rotation)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

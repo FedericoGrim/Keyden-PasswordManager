@@ -20,6 +20,7 @@ import infrastructure.databases.models.categories_model  # noqa: F401
 import infrastructure.databases.models.sub_account_categories_model  # noqa: F401
 import infrastructure.databases.models.user_favorite_model  # noqa: F401
 import infrastructure.databases.models.user_teams_keys_model  # noqa: F401
+import infrastructure.databases.models.sub_account_history_model  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:

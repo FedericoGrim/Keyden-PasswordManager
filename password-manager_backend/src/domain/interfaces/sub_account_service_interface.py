@@ -24,3 +24,7 @@ class ISubAccountService(ABC):
     @abstractmethod
     def DeleteSubAccountById(self, sub_account_id: uuid.UUID) -> dict[str, str]:
         pass
+
+    @abstractmethod
+    def UpdateSubAccountDek(self, sub_account_id: uuid.UUID, dek_wrapped: str) -> SubAccount:
+        pass
