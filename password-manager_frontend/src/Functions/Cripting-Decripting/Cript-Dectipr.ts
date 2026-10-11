@@ -59,6 +59,38 @@ export function base64ToBytes(b64: string): Uint8Array {
   return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
 }
 
+export function importAesKey(raw: Uint8Array): Promise<CryptoKey> {
+  return crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["encrypt", "decrypt"]);
+}
+
+// Envelope encryption for sub-account rows: each row has its own random data
+// key (DEK, same shape as a team key — generateSymmetricTeamKey() doubles as
+// the generator), wrapped with the team's AES key. Rotating the team key
+// only needs to re-wrap these small blobs, never the row's ciphertext.
+export async function wrapDek(dekRaw: Uint8Array, teamKey: CryptoKey): Promise<string> {
+  return encrypt(bytesToBase64(dekRaw), teamKey);
+}
+
+export async function unwrapDek(dekWrapped: string, teamKey: CryptoKey): Promise<Uint8Array> {
+  return base64ToBytes(await decrypt(dekWrapped, teamKey));
+}
+
+// Shared by every screen that lists sub-accounts: unwrap the row's DEK with
+// the team key, then decrypt its four fields with that DEK.
+export async function decryptSubAccountFields(
+  sa: { username_encrypted: string; email_encrypted: string; password_encrypted: string; site_link_encrypted: string; dek_wrapped: string },
+  teamKey: CryptoKey
+): Promise<{ username: string; email: string; password: string; siteLink: string }> {
+  const dek = await importAesKey(await unwrapDek(sa.dek_wrapped, teamKey));
+  const [username, email, password, siteLink] = await Promise.all([
+    decrypt(sa.username_encrypted, dek),
+    decrypt(sa.email_encrypted, dek),
+    decrypt(sa.password_encrypted, dek),
+    decrypt(sa.site_link_encrypted, dek),
+  ]);
+  return { username, email, password, siteLink };
+}
+
 // EC keypair (ECDH P-256), used for key-wrapping (not signing).
 export async function generateEcKeyPair(): Promise<{ publicKey: Uint8Array; privateKey: Uint8Array }> {
   const keyPair = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveBits"]);

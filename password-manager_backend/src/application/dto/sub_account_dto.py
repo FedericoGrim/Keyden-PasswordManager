@@ -11,6 +11,7 @@ class SubAccountDTO(BaseModel):
     password_encrypted: str
     site_link_encrypted: str
     required_perm_level_id: UUID4
+    dek_wrapped: Optional[str] = None
 
     def to_entity(self):
         return SubAccount(
@@ -19,7 +20,8 @@ class SubAccountDTO(BaseModel):
             email_encrypted=self.email_encrypted,
             password_encrypted=self.password_encrypted,
             site_link_encrypted=self.site_link_encrypted,
-            required_perm_level_id=self.required_perm_level_id
+            required_perm_level_id=self.required_perm_level_id,
+            dek_wrapped=self.dek_wrapped
         )
 
 class CreateSubAccountDTO(BaseModel):
@@ -29,6 +31,7 @@ class CreateSubAccountDTO(BaseModel):
     password_encrypted: str
     site_link_encrypted: str
     required_perm_level_id: UUID4
+    dek_wrapped: str
 
     def to_entity(self):
         return SubAccount(
@@ -37,7 +40,8 @@ class CreateSubAccountDTO(BaseModel):
             email_encrypted=self.email_encrypted,
             password_encrypted=self.password_encrypted,
             site_link_encrypted=self.site_link_encrypted,
-            required_perm_level_id=self.required_perm_level_id
+            required_perm_level_id=self.required_perm_level_id,
+            dek_wrapped=self.dek_wrapped
         )
 
 class UpdateSubAccountDTO(BaseModel):
@@ -55,8 +59,17 @@ class UpdateSubAccountDTO(BaseModel):
             email_encrypted=self.email_encrypted if self.email_encrypted is not None else existing_sub_account.email_encrypted,
             password_encrypted=self.password_encrypted if self.password_encrypted is not None else existing_sub_account.password_encrypted,
             site_link_encrypted=self.site_link_encrypted if self.site_link_encrypted is not None else existing_sub_account.site_link_encrypted,
-            required_perm_level_id=self.required_perm_level_id if self.required_perm_level_id is not None else existing_sub_account.required_perm_level_id
+            required_perm_level_id=self.required_perm_level_id if self.required_perm_level_id is not None else existing_sub_account.required_perm_level_id,
+            dek_wrapped=existing_sub_account.dek_wrapped
         )
-        
+
 class DeleteSubAccountDTO(BaseModel):
     id: UUID4
+
+class DekUpdateItem(BaseModel):
+    id: UUID4
+    dek_wrapped: str
+
+class RotateSubAccountDeksDTO(BaseModel):
+    sub_accounts: list[DekUpdateItem] = []
+    history: list[DekUpdateItem] = []

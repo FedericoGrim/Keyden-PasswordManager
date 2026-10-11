@@ -11,6 +11,7 @@ from infrastructure.databases.categories_postgresql import CategoriesService
 from infrastructure.databases.sub_account_categories_postgresql import SubAccountCategoriesService
 from infrastructure.databases.team_perm_levels_postgresql import TeamPermLevelsService
 from infrastructure.databases.user_favorites_postgreSQL import UserFavoritesService
+from infrastructure.databases.sub_account_history_postgreSQL import SubAccountHistoryService
 
 
 
@@ -29,6 +30,12 @@ from application.use_case.sub_account_use_case import (
     GetAllSubAccountsByTeamIdUseCase,
     UpdateSubAccountByIdUseCase,
     DeleteSubAccountByIdUseCase,
+    RotateSubAccountDeksUseCase,
+)
+
+from application.use_case.sub_account_history_use_case import (
+    GetSubAccountHistoryBySubAccountIdUseCase,
+    GetSubAccountHistoryByTeamIdUseCase,
 )
 
 from application.use_case.team_use_case import (
@@ -124,6 +131,7 @@ class UserContainer(containers.DeclarativeContainer):
 
 class SubAccountContainer(containers.DeclarativeContainer):
     SubAccountRepositoryFactory = providers.Factory(SubAccountService, db=providers.Dependency())
+    SubAccountHistoryRepositoryFactory = providers.Factory(SubAccountHistoryService, db=providers.Dependency())
 
     CreateSubAccountProvider = providers.Factory(
         CreateSubAccountUseCase,
@@ -140,10 +148,28 @@ class SubAccountContainer(containers.DeclarativeContainer):
     UpdateSubAccountByIdProvider = providers.Factory(
         UpdateSubAccountByIdUseCase,
         SubAccountRepository=SubAccountRepositoryFactory,
+        SubAccountHistoryRepository=SubAccountHistoryRepositoryFactory,
     )
     DeleteSubAccountByIdProvider = providers.Factory(
         DeleteSubAccountByIdUseCase,
         SubAccountRepository=SubAccountRepositoryFactory,
+    )
+    RotateSubAccountDeksProvider = providers.Factory(
+        RotateSubAccountDeksUseCase,
+        SubAccountRepository=SubAccountRepositoryFactory,
+        SubAccountHistoryRepository=SubAccountHistoryRepositoryFactory,
+    )
+
+class SubAccountHistoryContainer(containers.DeclarativeContainer):
+    SubAccountHistoryRepositoryFactory = providers.Factory(SubAccountHistoryService, db=providers.Dependency())
+
+    GetSubAccountHistoryBySubAccountIdProvider = providers.Factory(
+        GetSubAccountHistoryBySubAccountIdUseCase,
+        SubAccountHistoryRepository=SubAccountHistoryRepositoryFactory,
+    )
+    GetSubAccountHistoryByTeamIdProvider = providers.Factory(
+        GetSubAccountHistoryByTeamIdUseCase,
+        SubAccountHistoryRepository=SubAccountHistoryRepositoryFactory,
     )
 
 
@@ -318,4 +344,5 @@ class Container(containers.DeclarativeContainer):
     sub_account_categories = providers.Container(SubAccountCategoriesContainer)
     team_perm_levels = providers.Container(TeamPermLevelsContainer)
     user_favorites = providers.Container(UserFavoritesContainer)
+    sub_account_history = providers.Container(SubAccountHistoryContainer)
 

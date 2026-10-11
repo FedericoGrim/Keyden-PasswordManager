@@ -1,7 +1,9 @@
+import axios from 'axios';
 import axiosClient from './axiosClient';
 import { mainUser } from './entities/mainUser';
 import { userPublic } from './entities/userPublic';
 import { subAccount } from './entities/subAccount';
+import { subAccountHistory } from './entities/subAccountHistory';
 import { team } from './entities/team';
 import { teamMember } from './entities/teamMember';
 import { teamPermLevel } from './entities/teamPermLevel';
@@ -28,8 +30,12 @@ const getMainUserByKeycloakId = async (keycloak_user_id: UUID): Promise<mainUser
     try {
         const response = await axiosClient.get(`/api/user/${keycloak_user_id}`);
         return response.data.user as mainUser;
-    } catch {
-        return null;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+            return null;
+        }
+        console.error('Error fetching main user by keycloak id:', error);
+        throw error;
     }
 };
 
@@ -231,14 +237,48 @@ const getSubAccountsByTeamId = async (teamId: string): Promise<subAccount[]> => 
     }
 };
 
-const updateSubAccount = async (subaccountId: string, data: Partial<Omit<subAccount, 'id' | 'team_id'>>): Promise<void> => {
-    await axiosClient.put(`/api/subaccount/${subaccountId}`, { id: subaccountId, ...data });
+const updateSubAccount = async (subaccountId: string, data: Partial<Omit<subAccount, 'id' | 'team_id' | 'dek_wrapped'>>, interactorId: string): Promise<void> => {
+    await axiosClient.put(`/api/subaccount/${subaccountId}`, { id: subaccountId, ...data }, {
+        params: { interactor_id: interactorId },
+    });
 };
 
 const deleteSubAccount = async (subaccountId: string, interactorId: string): Promise<void> => {
     await axiosClient.delete(`/api/subaccount/${subaccountId}`, {
         params: { interactor_id: interactorId },
     });
+};
+
+const rotateSubAccountDeks = async (
+    teamId: string,
+    interactorId: string,
+    rotation: { sub_accounts: { id: string; dek_wrapped: string }[]; history: { id: string; dek_wrapped: string }[] }
+): Promise<void> => {
+    await axiosClient.put(`/api/subaccount/team/${teamId}/rotate-deks`, rotation, {
+        params: { interactor_id: interactorId },
+    });
+};
+
+// -------------------- Sub-account history --------------------
+
+const getSubAccountHistory = async (subaccountId: string): Promise<subAccountHistory[]> => {
+    try {
+        const response = await axiosClient.get(`/api/subaccount-history/${subaccountId}`);
+        return response.data.history as subAccountHistory[];
+    } catch (error) {
+        console.error('Error fetching sub-account history:', error);
+        return [];
+    }
+};
+
+const getSubAccountHistoryByTeamId = async (teamId: string): Promise<subAccountHistory[]> => {
+    try {
+        const response = await axiosClient.get(`/api/subaccount-history/team/${teamId}`);
+        return response.data.history as subAccountHistory[];
+    } catch (error) {
+        console.error('Error fetching team sub-account history:', error);
+        return [];
+    }
 };
 
 // -------------------- Favorites --------------------
@@ -286,6 +326,9 @@ export {
     getSubAccountsByTeamId,
     updateSubAccount,
     deleteSubAccount,
+    rotateSubAccountDeks,
+    getSubAccountHistory,
+    getSubAccountHistoryByTeamId,
     addFavorite,
     removeFavorite,
     getFavoritesByUserId,

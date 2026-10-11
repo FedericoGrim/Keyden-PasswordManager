@@ -10,7 +10,7 @@ import { provisionUser } from "@/Functions/Provisioning/provisionUser";
 import { deriveMasterKey, decrypt, base64ToBytes, ARGON2_PARAMS } from "@/Functions/Cripting-Decripting/Cript-Dectipr";
 import { VaultContext, VaultKeys } from "./VaultContext";
 
-type GateState = "loading" | "needsMasterPassword" | "locked" | "ready";
+type GateState = "loading" | "needsMasterPassword" | "locked" | "ready" | "error";
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<GateState>("loading");
@@ -26,12 +26,18 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       const keycloakId = keycloak.tokenParsed?.sub;
       if (!keycloakId) return;
 
-      const user = await getMainUserByKeycloakId(keycloakId as UUID);
-      if (user) {
-        setExistingUser(user);
-        setState("locked");
-      } else {
-        setState("needsMasterPassword");
+      try {
+        const user = await getMainUserByKeycloakId(keycloakId as UUID);
+        if (user) {
+          setExistingUser(user);
+          setState("locked");
+        } else {
+          setState("needsMasterPassword");
+        }
+      } catch (err) {
+        console.error("Error checking provisioning status:", err);
+        setError("Could not reach the server. Please try again.");
+        setState("error");
       }
     };
 
@@ -105,6 +111,14 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (state === "error") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>{error ?? "Something went wrong."}</p>
       </div>
     );
   }

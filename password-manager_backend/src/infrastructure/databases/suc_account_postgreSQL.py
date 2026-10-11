@@ -19,6 +19,7 @@ def _to_domain(model: SubAccountModel) -> SubAccount:
         password_encrypted=model.password_encrypted,
         site_link_encrypted=model.site_link_encrypted,
         required_perm_level_id=model.required_perm_level_id,
+        dek_wrapped=model.dek_wrapped,
     )
 
 
@@ -34,7 +35,8 @@ class SubAccountService(ISubAccountService):
                 password_encrypted = sub_account.password_encrypted,
                 email_encrypted = sub_account.email_encrypted,
                 site_link_encrypted = sub_account.site_link_encrypted,
-                required_perm_level_id = sub_account.required_perm_level_id
+                required_perm_level_id = sub_account.required_perm_level_id,
+                dek_wrapped = sub_account.dek_wrapped
             )
 
             self.db.add(subaccount_model)
@@ -100,3 +102,18 @@ class SubAccountService(ISubAccountService):
         except Exception as e:
             logging.error(f"Error: {e}")
             raise SubAccountDeletionException("Failed to delete sub_account.")
+
+    def UpdateSubAccountDek(self, sub_account_id: uuid.UUID, dek_wrapped: str) -> SubAccount:
+        try:
+            subaccount_model = self.db.query(SubAccountModel).filter(SubAccountModel.id == sub_account_id).first()
+            if not subaccount_model:
+                raise SubAccountNotFoundException("SubAccount not found.")
+
+            subaccount_model.dek_wrapped = dek_wrapped
+            self.db.flush()
+            self.db.refresh(subaccount_model)
+            return _to_domain(subaccount_model)
+
+        except Exception as e:
+            logging.error(f"Error: {e}")
+            raise SubAccountUpdateException("Failed to update sub_account data key.")
