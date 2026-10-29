@@ -13,3 +13,6 @@ SDK/**/.env
 
 # --- draw.io backup/lock files ---
 .$*.bkp
+
+# --- Personal editor settings ---
+.vscode/
