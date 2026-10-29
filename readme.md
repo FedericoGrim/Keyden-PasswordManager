@@ -122,7 +122,7 @@ Beyond the live Swagger/ReDoc UIs, the backend's internal architecture is docume
 
 ## Project status
 
-Keyden is an active, evolving project. Contributions, issues, and suggestions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Known bugs and planned work live in [TODO.md](TODO.md). The database schema diagram is in [`docs/`](docs/PasswordManager_Schema.drawio). Report vulnerabilities via [SECURITY.md](SECURITY.md).
+Keyden is an active, evolving project. Contributions, issues, and suggestions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Known bugs and planned work are tracked in [Issues](https://github.com/FedericoGrim/Keyden-PasswordManager/issues). The database schema diagram is in [`docs/`](docs/PasswordManager_Schema.drawio). Report vulnerabilities via [SECURITY.md](SECURITY.md).
 
 ## License
 

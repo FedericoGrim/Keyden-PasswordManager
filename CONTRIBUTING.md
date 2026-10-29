@@ -8,7 +8,7 @@ Follow [Getting started](readme.md#getting-started) to run the dev stack, backen
 
 ## Workflow
 
-1. Open an issue first for anything bigger than a small fix (see [TODO.md](TODO.md) for known work).
+1. Open an issue first for anything bigger than a small fix (see the [open issues](https://github.com/FedericoGrim/Keyden-PasswordManager/issues) for known work).
 2. Fork, then branch from `develop`: `feature/<short-name>` or `fix/<short-name>`.
 3. Keep changes focused: one concern per PR.
 4. Make sure checks pass locally (same as [CI](.github/workflows/ci.yml)):
