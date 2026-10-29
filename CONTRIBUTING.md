@@ -32,4 +32,6 @@ Conventional style preferred: `feat: ...`, `fix: ...`, `docs: ...`, `refactor: .
 
 Never open a public issue for a vulnerability. See [SECURITY.md](SECURITY.md).
 
+Please follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+
 By contributing you agree your work is licensed under the [AGPL-3.0](LICENSE).
