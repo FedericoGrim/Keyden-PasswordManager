@@ -1,0 +1,29 @@
+name: Sync main into develop
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Open PR main -> develop
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -n "$(gh pr list --base develop --head main --state open --json number -q '.[]')" ]; then
+            echo "PR already open"; exit 0
+          fi
+          if git diff --quiet origin/develop origin/main; then
+            echo "branches identical"; exit 0
+          fi
+          gh pr create --base develop --head main \
+            --title "chore: sync main into develop" \
+            --body "Automated back-merge after changes landed on main (e.g. release commit with version and CHANGELOG)."
