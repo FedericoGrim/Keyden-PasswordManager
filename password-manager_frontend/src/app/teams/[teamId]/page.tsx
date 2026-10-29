@@ -17,7 +17,7 @@ import {
 import { team } from "@/api/entities/team";
 import { teamPermLevel } from "@/api/entities/teamPermLevel";
 import { category } from "@/api/entities/category";
-import { unwrapTeamKey, decrypt } from "@/Functions/Cripting-Decripting/Cript-Dectipr";
+import { unwrapTeamKey, importAesKey, decryptSubAccountFields } from "@/Functions/Cripting-Decripting/Cript-Dectipr";
 import SubAccountForm, { DecryptedSubAccount } from "./page-components/subAccountForm/subAccountForm";
 import ShareTeamDialog from "./page-components/shareTeamDialog/shareTeamDialog";
 import MembersList from "./page-components/membersList/membersList";
@@ -52,7 +52,7 @@ export default function TeamDetailPage() {
         return;
       }
       const raw = await unwrapTeamKey(match.team_key_encrypted, vault.privateKeyEc, vault.privateKeyPq);
-      const aesKey = await crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["encrypt", "decrypt"]);
+      const aesKey = await importAesKey(raw);
       setTeamKeyRaw(raw);
       setTeamAesKey(aesKey);
     });
@@ -67,11 +67,9 @@ export default function TeamDetailPage() {
     const decrypted = await Promise.all(
       raw.map(async (sa) => ({
         id: sa.id,
-        username: await decrypt(sa.username_encrypted, teamAesKey),
-        email: await decrypt(sa.email_encrypted, teamAesKey),
-        password: await decrypt(sa.password_encrypted, teamAesKey),
-        siteLink: await decrypt(sa.site_link_encrypted, teamAesKey),
+        ...(await decryptSubAccountFields(sa, teamAesKey)),
         requiredPermLevelId: sa.required_perm_level_id,
+        dekWrapped: sa.dek_wrapped,
       }))
     );
     setSubAccounts(decrypted);

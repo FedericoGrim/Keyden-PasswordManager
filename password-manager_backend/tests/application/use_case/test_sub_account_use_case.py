@@ -19,11 +19,17 @@ from application.use_case.sub_account_use_case import (
 )
 from domain.entities.sub_account import SubAccount
 from domain.interfaces.sub_account_service_interface import ISubAccountService
+from domain.interfaces.sub_account_history_service_interface import ISubAccountHistoryService
 
 
 @pytest.fixture
 def repo():
     return MagicMock(spec=ISubAccountService)
+
+
+@pytest.fixture
+def history_repo():
+    return MagicMock(spec=ISubAccountHistoryService)
 
 
 def make_sub_account(**overrides):
@@ -35,6 +41,7 @@ def make_sub_account(**overrides):
         username_encrypted="enc-user",
         email_encrypted="enc-email",
         site_link_encrypted="enc-link",
+        dek_wrapped="enc-dek",
     )
     defaults.update(overrides)
     return SubAccount(**defaults)
@@ -52,6 +59,7 @@ class TestCreateSubAccountUseCase:
             password_encrypted="enc-pass",
             site_link_encrypted="enc-link",
             required_perm_level_id=created.required_perm_level_id,
+            dek_wrapped="enc-dek",
         )
 
         result = CreateSubAccountUseCase(repo).execute(uuid.uuid4(), dto)
@@ -71,6 +79,7 @@ class TestCreateSubAccountUseCase:
             password_encrypted="p",
             site_link_encrypted="s",
             required_perm_level_id=uuid.uuid4(),
+            dek_wrapped="d",
         )
 
         with pytest.raises(CreateSubAccountException) as exc_info:
@@ -116,7 +125,7 @@ class TestGetAllSubAccountsByTeamIdUseCase:
 
 
 class TestUpdateSubAccountByIdUseCase:
-    def test_merges_into_existing_and_returns_dto(self, repo):
+    def test_merges_into_existing_and_returns_dto(self, repo, history_repo):
         existing = make_sub_account(username_encrypted="old-user")
         updated = make_sub_account(id=existing.id, team_id=existing.team_id, username_encrypted="new-user")
         repo.GetSubAccountById.return_value = existing
@@ -131,13 +140,14 @@ class TestUpdateSubAccountByIdUseCase:
             required_perm_level_id=None,
         )
 
-        result = UpdateSubAccountByIdUseCase(repo).execute(uuid.uuid4(), dto)
+        result = UpdateSubAccountByIdUseCase(repo, history_repo).execute(uuid.uuid4(), dto)
 
         assert result.id == existing.id
         assert result.username_encrypted == "new-user"
         repo.GetSubAccountById.assert_called_once_with(existing.id)
+        history_repo.CreateHistoryEntry.assert_called_once()
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo, history_repo):
         repo.GetSubAccountById.side_effect = Exception("missing")
         dto = UpdateSubAccountDTO(
             id=uuid.uuid4(),
@@ -149,7 +159,7 @@ class TestUpdateSubAccountByIdUseCase:
         )
 
         with pytest.raises(SubAccountUpdateException):
-            UpdateSubAccountByIdUseCase(repo).execute(uuid.uuid4(), dto)
+            UpdateSubAccountByIdUseCase(repo, history_repo).execute(uuid.uuid4(), dto)
 
 
 class TestDeleteSubAccountByIdUseCase:

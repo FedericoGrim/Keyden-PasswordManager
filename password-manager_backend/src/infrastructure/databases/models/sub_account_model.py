@@ -19,3 +19,4 @@ class SubAccountModel(Base):
     password_encrypted: Mapped[str] = mapped_column(String, nullable=False)
     site_link_encrypted: Mapped[str | None] = mapped_column(String(255), nullable=True)
     required_perm_level_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("team_perm_levels.id", ondelete="CASCADE"), nullable=False)
+    dek_wrapped: Mapped[str | None] = mapped_column(String, nullable=True)

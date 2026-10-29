@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 
 import { createSubAccount, updateSubAccount, createSubAccountCategory } from "@/api/apis";
-import { encrypt } from "@/Functions/Cripting-Decripting/Cript-Dectipr";
+import { encrypt, generateSymmetricTeamKey, importAesKey, wrapDek, unwrapDek } from "@/Functions/Cripting-Decripting/Cript-Dectipr";
 import { teamPermLevel } from "@/api/entities/teamPermLevel";
 import { category } from "@/api/entities/category";
 import "./subAccountForm.css";
@@ -15,6 +15,7 @@ export type DecryptedSubAccount = {
   password: string;
   siteLink: string;
   requiredPermLevelId: string;
+  dekWrapped: string;
 };
 
 export default function SubAccountForm({
@@ -52,11 +53,18 @@ export default function SubAccountForm({
     setError(null);
     setSubmitting(true);
     try {
+      // Every entry is encrypted with its own data key (DEK), not the team
+      // key directly — reuse the existing DEK on edit, mint one on create.
+      const dekRaw = editing
+        ? await unwrapDek(editing.dekWrapped, teamAesKey)
+        : generateSymmetricTeamKey();
+      const dek = await importAesKey(dekRaw);
+
       const [usernameEnc, emailEnc, passwordEnc, siteLinkEnc] = await Promise.all([
-        encrypt(username, teamAesKey),
-        encrypt(email, teamAesKey),
-        encrypt(password, teamAesKey),
-        encrypt(siteLink, teamAesKey),
+        encrypt(username, dek),
+        encrypt(email, dek),
+        encrypt(password, dek),
+        encrypt(siteLink, dek),
       ]);
 
       if (editing) {
@@ -66,7 +74,7 @@ export default function SubAccountForm({
           password_encrypted: passwordEnc,
           site_link_encrypted: siteLinkEnc,
           required_perm_level_id: permLevelId,
-        });
+        }, interactorId);
       } else {
         const newId = await createSubAccount(
           {
@@ -76,6 +84,7 @@ export default function SubAccountForm({
             password_encrypted: passwordEnc,
             site_link_encrypted: siteLinkEnc,
             required_perm_level_id: permLevelId,
+            dek_wrapped: await wrapDek(dekRaw, teamAesKey),
           },
           interactorId
         );

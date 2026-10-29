@@ -11,6 +11,22 @@ updates:
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    groups:
+      # @mui/material and @mui/icons-material declare peer dependencies on
+      # each other's major version — bumping one without the other breaks
+      # `npm ci` with an ERESOLVE conflict. Bundle them into one PR.
+      mui:
+        patterns:
+          - "@mui/*"
+      # eslint, eslint-config-next, and @typescript-eslint/* all had to move
+      # together to keep `next lint`/`eslint .` working (see the fix in
+      # fix_frontend_lint_ci) — bundle them too so a partial bump can't
+      # silently reintroduce that breakage.
+      eslint:
+        patterns:
+          - "eslint"
+          - "eslint-config-next"
+          - "@typescript-eslint/*"
 
   - package-ecosystem: "github-actions"
     directory: "/"

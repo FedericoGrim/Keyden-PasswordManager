@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import RequestResponseEndpoint
 
 from config import Container
-from infrastructure.keycloak.jwt_token_autentication import jwt_authentication
+from infrastructure.auth.oidc_authentication import jwt_authentication
 from presentation.controllers.user_controller import router as user_router
 from presentation.controllers.sub_account_controller import router as subaccount_router
 from presentation.controllers.team_controller import router as team_router
@@ -13,6 +13,7 @@ from presentation.controllers.categories_controller import router as categories_
 from presentation.controllers.sub_account_categories_controller import router as subacc_categories_router
 from presentation.controllers.team_perm_levels_controller import router as team_perm_levels_router
 from presentation.controllers.user_favorite_controller import router as user_favorites_router
+from presentation.controllers.sub_account_history_controller import router as subaccount_history_router
 
 from infrastructure.databases.database import SessionLocal
 
@@ -46,7 +47,8 @@ container.wire(modules=["presentation.controllers.user_controller",
                         "presentation.controllers.categories_controller",
                         "presentation.controllers.sub_account_categories_controller",
                         "presentation.controllers.team_perm_levels_controller",
-                        "presentation.controllers.user_favorite_controller"
+                        "presentation.controllers.user_favorite_controller",
+                        "presentation.controllers.sub_account_history_controller"
                         ])
 
 app = FastAPI()
@@ -121,6 +123,13 @@ app.include_router(
     user_favorites_router,
     prefix="/api/favorites",
     tags=["Favorites"],
+    dependencies=[Depends(jwt_authentication)],
+)
+
+app.include_router(
+    subaccount_history_router,
+    prefix="/api/subaccount-history",
+    tags=["SubAccountHistory"],
     dependencies=[Depends(jwt_authentication)],
 )
 

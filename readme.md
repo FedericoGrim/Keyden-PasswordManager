@@ -16,7 +16,16 @@
   <img alt="Docker" src="https://img.shields.io/badge/deploy-Docker-2496ED?logo=docker&logoColor=white">
 </p>
 
+<p align="center">
+  <img alt="CI" src="https://github.com/FedericoGrim/Keyden-PasswordManager/actions/workflows/ci.yml/badge.svg">
+  <img alt="License: AGPL v3" src="https://img.shields.io/badge/license-AGPL--3.0-blue">
+  <img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen">
+</p>
+
 ---
+
+> [!WARNING]
+> **Super alpha (0.x).** Keyden is under heavy development: APIs and data formats may change without notice, parts of the frontend are missing, and known bugs exist (see [Issues](https://github.com/FedericoGrim/Keyden-PasswordManager/issues)). **Do not use it for real passwords yet.**
 
 Keyden is a password manager built around a simple rule: **the server never sees your secrets in plaintext.** Every password is encrypted client-side before it ever leaves the browser, and vaults can be shared with a team without the backend — or anyone but the intended recipients — ever holding a usable key.
 
@@ -46,7 +55,7 @@ password-manager_frontend/   Next.js app — UI, client-side crypto, Keycloak lo
 password-manager_backend/    FastAPI app
   src/domain/                 entities & repository interfaces
   src/application/            use cases (business logic) & DTOs
-  src/infrastructure/         PostgreSQL repositories, Keycloak JWT validation
+  src/infrastructure/         PostgreSQL repositories, OIDC/JWKS token validation
   src/presentation/           FastAPI controllers/routers
 SDK/develop/                  Postgres + Keycloak dev stack (docker-compose)
 SDK/production/               production stack (docker-compose)
@@ -116,7 +125,7 @@ Beyond the live Swagger/ReDoc UIs, the backend's internal architecture is docume
 
 ## Project status
 
-Keyden is an active, evolving project. Contributions, issues, and suggestions are welcome.
+Keyden is an active, evolving project. Contributions, issues, and suggestions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Known bugs and planned work are tracked in [Issues](https://github.com/FedericoGrim/Keyden-PasswordManager/issues). The database schema diagram is in [`docs/`](docs/PasswordManager_Schema.drawio). Report vulnerabilities via [SECURITY.md](SECURITY.md).
 
 ## License
 
