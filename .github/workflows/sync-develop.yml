@@ -18,7 +18,7 @@ jobs:
 
       - name: Open PR main -> develop
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
         run: |
           if [ -n "$(gh pr list --base develop --head main --state open --json number -q '.[]')" ]; then
             echo "PR already open"; exit 0
