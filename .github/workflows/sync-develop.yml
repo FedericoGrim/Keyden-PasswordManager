@@ -26,6 +26,8 @@ jobs:
           if git diff --quiet origin/develop origin/main; then
             echo "branches identical"; exit 0
           fi
-          gh pr create --base develop --head main \
+          pr=$(gh pr create --base develop --head main \
             --title "chore: sync main into develop" \
-            --body "Automated back-merge after changes landed on main (e.g. release commit with version and CHANGELOG)."
+            --body "Automated back-merge after changes landed on main (e.g. release commit with version and CHANGELOG).")
+          # merge commit (not squash) keeps main and develop history aligned
+          gh pr merge "$pr" --auto --merge
