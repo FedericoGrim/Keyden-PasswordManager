@@ -46,7 +46,7 @@ password-manager_frontend/   Next.js app — UI, client-side crypto, Keycloak lo
 password-manager_backend/    FastAPI app
   src/domain/                 entities & repository interfaces
   src/application/            use cases (business logic) & DTOs
-  src/infrastructure/         PostgreSQL repositories, Keycloak JWT validation
+  src/infrastructure/         PostgreSQL repositories, OIDC/JWKS token validation
   src/presentation/           FastAPI controllers/routers
 SDK/develop/                  Postgres + Keycloak dev stack (docker-compose)
 SDK/production/               production stack (docker-compose)
