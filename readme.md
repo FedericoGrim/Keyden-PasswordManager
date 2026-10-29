@@ -24,6 +24,9 @@
 
 ---
 
+> [!WARNING]
+> **Super alpha (0.x).** Keyden is under heavy development: APIs and data formats may change without notice, parts of the frontend are missing, and known bugs exist (see [Issues](https://github.com/FedericoGrim/Keyden-PasswordManager/issues)). **Do not use it for real passwords yet.**
+
 Keyden is a password manager built around a simple rule: **the server never sees your secrets in plaintext.** Every password is encrypted client-side before it ever leaves the browser, and vaults can be shared with a team without the backend — or anyone but the intended recipients — ever holding a usable key.
 
 ## Highlights
