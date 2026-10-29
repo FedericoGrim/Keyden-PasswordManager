@@ -123,6 +123,23 @@ pytest
 
 Beyond the live Swagger/ReDoc UIs, the backend's internal architecture is documented with Sphinx — see [`password-manager_backend/docs`](password-manager_backend/docs/readme.md).
 
+## Roadmap
+
+Planned work is tracked as [milestones](https://github.com/FedericoGrim/Keyden-PasswordManager/milestones):
+
+| Milestone | Theme |
+|---|---|
+| `v0.2.0` | Bug fixes and performance baseline |
+| `v0.3.0` | Provider-agnostic login |
+| `v0.4.0` | Complete team management |
+| `v0.5.0` | Account and personal organization |
+| `v1.0.0` | Release candidate: backup, crypto review, tests, deploy docs |
+| `v1.1.0` | Hardware security keys, mobile-friendly frontend |
+| `v1.2.0` | Advanced security: notifications, anomaly detection, audit log |
+| `v1.3.0` | Helm chart and Terraform module for AWS |
+| `v2.0.0` | Organizations |
+| `v2.1.0` | Offline mobile app (Flutter + SQLite) |
+
 ## Project status
 
 Keyden is an active, evolving project. Contributions, issues, and suggestions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Known bugs and planned work are tracked in [Issues](https://github.com/FedericoGrim/Keyden-PasswordManager/issues). The database schema diagram is in [`docs/`](docs/PasswordManager_Schema.drawio). Report vulnerabilities via [SECURITY.md](SECURITY.md).
