@@ -1,34 +1,45 @@
 class TeamPermLevelAlreadyExistsException(Exception):
-    def __init__(self, message: str="Team perm level with the same name already exists for this team."):
+    def __init__(
+        self,
+        message: str = "Team perm level with the same name already exists for this team.",  # noqa: E501
+    ) -> None:
         self.message = message
         super().__init__(self.message)
+
 
 class TeamPermLevelCreationFailedException(Exception):
-    def __init__(self, message: str="Failed to create team perm level."):
+    def __init__(self, message: str = "Failed to create team perm level.") -> None:
         self.message = message
         super().__init__(self.message)
+
 
 class GetAllTeamPermLevelsByTeamIdNotFoundException(Exception):
-    def __init__(self, message: str="No perm levels found for the given team ID."):
+    def __init__(
+        self, message: str = "No perm levels found for the given team ID."
+    ) -> None:
         self.message = message
         super().__init__(self.message)
+
 
 class TeamPermLevelRetrievalException(Exception):
-    def __init__(self, message: str="Failed to retrieve team perm levels."):
+    def __init__(self, message: str = "Failed to retrieve team perm levels.") -> None:
         self.message = message
         super().__init__(self.message)
+
 
 class TeamPermLevelNotFoundException(Exception):
-    def __init__(self, message: str="Team perm level not found."):
+    def __init__(self, message: str = "Team perm level not found.") -> None:
         self.message = message
         super().__init__(self.message)
+
 
 class TeamPermLevelUpdateException(Exception):
-    def __init__(self, message: str="Failed to update team perm level."):
+    def __init__(self, message: str = "Failed to update team perm level.") -> None:
         self.message = message
         super().__init__(self.message)
 
+
 class TeamPermLevelDeletionException(Exception):
-    def __init__(self, message: str="Failed to delete team perm level."):
+    def __init__(self, message: str = "Failed to delete team perm level.") -> None:
         self.message = message
         super().__init__(self.message)

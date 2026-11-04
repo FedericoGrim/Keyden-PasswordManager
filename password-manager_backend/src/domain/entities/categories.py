@@ -4,7 +4,7 @@ from typing import Optional
 
 
 @dataclass
-class Categories:
+class Category:
     team_id: Optional[uuid.UUID] = None
     name: Optional[str] = None
     id: Optional[uuid.UUID] = None

@@ -3,7 +3,15 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.team_perm_levels_postgresql_exceptions import *
+from infrastructure.exceptions.team_perm_levels_postgresql_exceptions import (
+    GetAllTeamPermLevelsByTeamIdNotFoundException,
+    TeamPermLevelAlreadyExistsException,
+    TeamPermLevelCreationFailedException,
+    TeamPermLevelDeletionException,
+    TeamPermLevelNotFoundException,
+    TeamPermLevelRetrievalException,
+    TeamPermLevelUpdateException,
+)
 
 from domain.interfaces.team_perm_level_service_interface import ITeamPermLevelService
 from domain.entities.team_perm_level import TeamPermLevel
@@ -20,15 +28,13 @@ def _to_domain(model: TeamPermLevelModel) -> TeamPermLevel:
 
 
 class TeamPermLevelsService(ITeamPermLevelService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.Db = db
 
     def CreateTeamPermLevel(self, perm_level: TeamPermLevel) -> TeamPermLevel:
         try:
             perm_level_model = TeamPermLevelModel(
-                team_id = perm_level.team_id,
-                name = perm_level.name,
-                rank = perm_level.rank
+                team_id=perm_level.team_id, name=perm_level.name, rank=perm_level.rank
             )
 
             self.Db.add(perm_level_model)
@@ -37,15 +43,23 @@ class TeamPermLevelsService(ITeamPermLevelService):
             return _to_domain(perm_level_model)
 
         except IntegrityError:
-            raise TeamPermLevelAlreadyExistsException("Team perm level with the same name already exists for this team.")
+            raise TeamPermLevelAlreadyExistsException(
+                "Team perm level with the same name already exists for this team."
+            )
 
         except Exception as e:
             logging.error(f"Error: {e}")
-            raise TeamPermLevelCreationFailedException("Failed to create team perm level.")
+            raise TeamPermLevelCreationFailedException(
+                "Failed to create team perm level."
+            )
 
     def GetTeamPermLevelById(self, perm_level_id: uuid.UUID) -> TeamPermLevel:
         try:
-            perm_level_model = self.Db.query(TeamPermLevelModel).filter(TeamPermLevelModel.id == perm_level_id).first()
+            perm_level_model = (
+                self.Db.query(TeamPermLevelModel)
+                .filter(TeamPermLevelModel.id == perm_level_id)
+                .first()
+            )
             if not perm_level_model:
                 raise TeamPermLevelNotFoundException("Team perm level not found.")
             return _to_domain(perm_level_model)
@@ -56,18 +70,34 @@ class TeamPermLevelsService(ITeamPermLevelService):
 
     def GetAllTeamPermLevelsByTeamId(self, teamId: uuid.UUID) -> list[TeamPermLevel]:
         try:
-            perm_level_models: list[TeamPermLevelModel] = self.Db.query(TeamPermLevelModel).filter(TeamPermLevelModel.team_id == teamId).all()
+            perm_level_models: list[TeamPermLevelModel] = (
+                self.Db.query(TeamPermLevelModel)
+                .filter(TeamPermLevelModel.team_id == teamId)
+                .all()
+            )
             if not perm_level_models:
-                raise GetAllTeamPermLevelsByTeamIdNotFoundException("No perm levels found for the given team ID.")
-            return [_to_domain(perm_level_model) for perm_level_model in perm_level_models]
+                raise GetAllTeamPermLevelsByTeamIdNotFoundException(
+                    "No perm levels found for the given team ID."
+                )
+            return [
+                _to_domain(perm_level_model) for perm_level_model in perm_level_models
+            ]
 
         except Exception as e:
             logging.error(f"Error: {e}")
-            raise TeamPermLevelRetrievalException("Failed to retrieve team perm levels.")
+            raise TeamPermLevelRetrievalException(
+                "Failed to retrieve team perm levels."
+            )
 
-    def UpdateTeamPermLevelById(self, perm_level_id: uuid.UUID, new_perm_level: TeamPermLevel) -> TeamPermLevel:
+    def UpdateTeamPermLevelById(
+        self, perm_level_id: uuid.UUID, new_perm_level: TeamPermLevel
+    ) -> TeamPermLevel:
         try:
-            perm_level_model = self.Db.query(TeamPermLevelModel).filter(TeamPermLevelModel.id == perm_level_id).first()
+            perm_level_model = (
+                self.Db.query(TeamPermLevelModel)
+                .filter(TeamPermLevelModel.id == perm_level_id)
+                .first()
+            )
             if not perm_level_model:
                 raise TeamPermLevelNotFoundException("Team perm level not found.")
 
@@ -84,7 +114,11 @@ class TeamPermLevelsService(ITeamPermLevelService):
 
     def DeleteTeamPermLevelById(self, perm_level_id: uuid.UUID) -> bool:
         try:
-            perm_level_model = self.Db.query(TeamPermLevelModel).filter(TeamPermLevelModel.id == perm_level_id).first()
+            perm_level_model = (
+                self.Db.query(TeamPermLevelModel)
+                .filter(TeamPermLevelModel.id == perm_level_id)
+                .first()
+            )
             if not perm_level_model:
                 raise TeamPermLevelNotFoundException("Team perm level not found.")
 

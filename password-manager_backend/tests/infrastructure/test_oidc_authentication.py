@@ -1,4 +1,5 @@
 import time
+from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
@@ -16,34 +17,52 @@ AUDIENCE = "api"
 JWKS_URI = f"{ISSUER}/certs"
 
 
-def _rsa_key(kid: str) -> tuple[str, dict]:
-    private_pem = rsa.generate_private_key(public_exponent=65537, key_size=2048).private_bytes(
-        serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()
-    ).decode()
+def _rsa_key(kid: str) -> tuple[str, dict[str, Any]]:
+    private_pem = (
+        rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        .private_bytes(
+            serialization.Encoding.PEM,
+            serialization.PrivateFormat.PKCS8,
+            serialization.NoEncryption(),
+        )
+        .decode()
+    )
     public_jwk = jwk.construct(private_pem, "RS256").public_key().to_dict()
     public_jwk["kid"] = kid
     return private_pem, public_jwk
 
 
-def _token(private_pem: str, kid: str, **claims) -> str:
-    payload = {"sub": "user-1", "iss": ISSUER, "aud": AUDIENCE, "exp": int(time.time()) + 60, **claims}
+def _token(private_pem: str, kid: str, **claims: Any) -> str:  # noqa: ANN401
+    payload = {
+        "sub": "user-1",
+        "iss": ISSUER,
+        "aud": AUDIENCE,
+        "exp": int(time.time()) + 60,
+        **claims,
+    }
     return jwt.encode(payload, private_pem, algorithm="RS256", headers={"kid": kid})
 
 
-def _authenticate(token: str) -> dict:
-    return oidc.jwt_authentication(HTTPAuthorizationCredentials(scheme="Bearer", credentials=token))
+def _authenticate(token: str) -> dict[str, Any]:
+    return oidc.jwt_authentication(
+        HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
+    )
 
 
 @pytest.fixture
-def idp(monkeypatch):
+def idp(monkeypatch: pytest.MonkeyPatch) -> MagicMock:
     """Fake IdP: tests set idp.jwks; every GET is recorded in idp.calls."""
     state = MagicMock(jwks={"keys": []}, calls=[], down=False)
 
-    def fake_get(url, timeout):
+    def fake_get(url: str, timeout: float) -> MagicMock:
         state.calls.append(url)
         if state.down:
             raise requests.ConnectionError("down")
-        body = {"jwks_uri": JWKS_URI} if url.endswith("/.well-known/openid-configuration") else state.jwks
+        body = (
+            {"jwks_uri": JWKS_URI}
+            if url.endswith("/.well-known/openid-configuration")
+            else state.jwks
+        )
         return MagicMock(json=lambda: body, raise_for_status=lambda: None)
 
     monkeypatch.setenv("OIDC_ISSUER", ISSUER)
@@ -52,11 +71,11 @@ def idp(monkeypatch):
     monkeypatch.setattr(oidc.requests, "get", fake_get)
     monkeypatch.setattr(oidc, "_jwks_keys", {})
     monkeypatch.setattr(oidc, "_jwks_fetched_at", float("-inf"))
-    oidc._discovery_document.cache_clear()
+    oidc._discovery_document.cache_clear()  # pyright: ignore[reportPrivateUsage]
     return state
 
 
-def test_valid_token_uses_discovery_and_caches_jwks(idp):
+def test_valid_token_uses_discovery_and_caches_jwks(idp: MagicMock) -> None:
     private_pem, public_jwk = _rsa_key("k1")
     idp.jwks = {"keys": [public_jwk]}
 
@@ -66,7 +85,9 @@ def test_valid_token_uses_discovery_and_caches_jwks(idp):
     assert idp.calls == [f"{ISSUER}/.well-known/openid-configuration", JWKS_URI]
 
 
-def test_rotated_key_triggers_jwks_refetch(idp, monkeypatch):
+def test_rotated_key_triggers_jwks_refetch(
+    idp: MagicMock, monkeypatch: pytest.MonkeyPatch
+) -> None:
     old_pem, old_jwk = _rsa_key("old")
     new_pem, new_jwk = _rsa_key("new")
     idp.jwks = {"keys": [old_jwk]}
@@ -78,7 +99,7 @@ def test_rotated_key_triggers_jwks_refetch(idp, monkeypatch):
     assert _authenticate(_token(new_pem, "new"))["sub"] == "user-1"
 
 
-def test_unknown_kid_refetch_is_rate_limited(idp):
+def test_unknown_kid_refetch_is_rate_limited(idp: MagicMock) -> None:
     private_pem, public_jwk = _rsa_key("k1")
     idp.jwks = {"keys": [public_jwk]}
     _authenticate(_token(private_pem, "k1"))
@@ -91,8 +112,12 @@ def test_unknown_kid_refetch_is_rate_limited(idp):
     assert idp.calls.count(JWKS_URI) == 1
 
 
-@pytest.mark.parametrize("claims", [{"iss": "https://evil.example.com"}, {"aud": "other"}, {"exp": 1}])
-def test_rejects_wrong_issuer_audience_or_expired(idp, claims):
+@pytest.mark.parametrize(
+    "claims", [{"iss": "https://evil.example.com"}, {"aud": "other"}, {"exp": 1}]
+)
+def test_rejects_wrong_issuer_audience_or_expired(
+    idp: MagicMock, claims: dict[str, Any]
+) -> None:
     private_pem, public_jwk = _rsa_key("k1")
     idp.jwks = {"keys": [public_jwk]}
 
@@ -101,11 +126,16 @@ def test_rejects_wrong_issuer_audience_or_expired(idp, claims):
     assert exc.value.status_code == 401
 
 
-def test_rejects_symmetric_token_signed_with_public_key(idp):
+def test_rejects_symmetric_token_signed_with_public_key(idp: MagicMock) -> None:
     _, public_jwk = _rsa_key("k1")
     idp.jwks = {"keys": [public_jwk]}
     forged = jwt.encode(
-        {"sub": "attacker", "iss": ISSUER, "aud": AUDIENCE, "exp": int(time.time()) + 60},
+        {
+            "sub": "attacker",
+            "iss": ISSUER,
+            "aud": AUDIENCE,
+            "exp": int(time.time()) + 60,
+        },
         "any-secret",
         algorithm="HS256",
         headers={"kid": "k1"},
@@ -116,7 +146,7 @@ def test_rejects_symmetric_token_signed_with_public_key(idp):
     assert exc.value.status_code == 401
 
 
-def test_unreachable_idp_returns_503(idp):
+def test_unreachable_idp_returns_503(idp: MagicMock) -> None:
     private_pem, _ = _rsa_key("k1")
     idp.down = True
 

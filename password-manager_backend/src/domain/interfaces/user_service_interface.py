@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 from domain.entities.user import User
 
+
 @abstractmethod
 class IUserService(ABC):
     @abstractmethod

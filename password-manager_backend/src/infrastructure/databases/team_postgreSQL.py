@@ -3,7 +3,17 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.team_postgreSQL_exceptions import *
+from infrastructure.exceptions.team_postgreSQL_exceptions import (
+    GetTeamByIdNotFoundException,
+    GetTeamByIdRetrivalException,
+    GetTeamsByUserIdNotFoundException,
+    TeamAlreadyExistsException,
+    TeamCreationFailedException,
+    TeamDeleteException,
+    TeamNotFoundException,
+    TeamRetrievalException,
+    TeamUpdateException,
+)
 
 from domain.interfaces.team_service_interface import ITeamService
 from domain.entities.team import Team
@@ -20,7 +30,7 @@ def _to_domain(model: TeamModel) -> Team:
 
 
 class TeamService(ITeamService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.Db = db
 
     def CreateTeam(self, new_team: Team) -> Team:
@@ -43,11 +53,15 @@ class TeamService(ITeamService):
             logging.error(f"Error: {e}")
             raise TeamCreationFailedException()
 
-    def GetTeamById(self, team_id: uuid.UUID):
+    def GetTeamById(self, team_id: uuid.UUID) -> Team:
         try:
-            team_model = self.Db.query(TeamModel).filter(TeamModel.id == team_id).first()
+            team_model = (
+                self.Db.query(TeamModel).filter(TeamModel.id == team_id).first()
+            )
             if not team_model:
-                raise GetTeamByIdNotFoundException("No Team found for the given Team Id.")
+                raise GetTeamByIdNotFoundException(
+                    "No Team found for the given Team Id."
+                )
 
             return _to_domain(team_model)
 
@@ -55,11 +69,18 @@ class TeamService(ITeamService):
             logging.error(f"Error: {e}")
             raise GetTeamByIdRetrivalException()
 
-    def GetTeamsByUserId(self, user_id: uuid.UUID):
+    def GetTeamsByUserId(self, user_id: uuid.UUID) -> list[Team]:
         try:
-            team_models: list[TeamModel] = self.Db.query(TeamModel).join(TeamMemberModel, TeamModel.id == TeamMemberModel.team_id).filter(TeamMemberModel.user_id == user_id).all()
+            team_models: list[TeamModel] = (
+                self.Db.query(TeamModel)
+                .join(TeamMemberModel, TeamModel.id == TeamMemberModel.team_id)
+                .filter(TeamMemberModel.user_id == user_id)
+                .all()
+            )
             if not team_models:
-                raise GetTeamsByUserIdNotFoundException("No Teams found for the given User Id.")
+                raise GetTeamsByUserIdNotFoundException(
+                    "No Teams found for the given User Id."
+                )
             return [_to_domain(team_model) for team_model in team_models]
 
         except Exception as e:
@@ -68,7 +89,9 @@ class TeamService(ITeamService):
 
     def UpdateTeamById(self, new_team: Team) -> Team:
         try:
-            team_model = self.Db.query(TeamModel).filter(TeamModel.id == new_team.id).first()
+            team_model = (
+                self.Db.query(TeamModel).filter(TeamModel.id == new_team.id).first()
+            )
             if not team_model:
                 raise TeamNotFoundException("Team not found.")
 
@@ -84,7 +107,9 @@ class TeamService(ITeamService):
 
     def DeleteTeamById(self, team_id: uuid.UUID) -> dict[str, str]:
         try:
-            team_model = self.Db.query(TeamModel).filter(TeamModel.id == team_id).first()
+            team_model = (
+                self.Db.query(TeamModel).filter(TeamModel.id == team_id).first()
+            )
             if not team_model:
                 raise TeamNotFoundException("Team not found.")
 

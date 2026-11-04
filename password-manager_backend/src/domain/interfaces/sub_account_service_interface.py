@@ -3,12 +3,13 @@ from abc import ABC, abstractmethod
 
 from domain.entities.sub_account import SubAccount
 
+
 @abstractmethod
 class ISubAccountService(ABC):
     @abstractmethod
     def CreateSubAccount(self, sub_account: SubAccount) -> SubAccount:
         pass
-    
+
     @abstractmethod
     def GetSubAccountById(self, sub_account_id: uuid.UUID) -> SubAccount:
         pass
@@ -26,5 +27,7 @@ class ISubAccountService(ABC):
         pass
 
     @abstractmethod
-    def UpdateSubAccountDek(self, sub_account_id: uuid.UUID, dek_wrapped: str) -> SubAccount:
+    def UpdateSubAccountDek(
+        self, sub_account_id: uuid.UUID, dek_wrapped: str
+    ) -> SubAccount:
         pass

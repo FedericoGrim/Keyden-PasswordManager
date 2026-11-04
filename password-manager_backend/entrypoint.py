@@ -3,6 +3,7 @@
 Waits for the database to accept TCP connections, applies Alembic
 migrations programmatically, then starts uvicorn.
 """
+
 import os
 import socket
 import sys
@@ -13,7 +14,9 @@ from alembic import command
 from alembic.config import Config
 
 
-def wait_for_db(host: str, port: int, timeout: float = 60.0, interval: float = 2.0) -> None:
+def wait_for_db(
+    host: str, port: int, timeout: float = 60.0, interval: float = 2.0
+) -> None:
     deadline = time.monotonic() + timeout
     while True:
         try:
@@ -21,7 +24,9 @@ def wait_for_db(host: str, port: int, timeout: float = 60.0, interval: float = 2
                 return
         except OSError:
             if time.monotonic() >= deadline:
-                print(f"Timed out waiting for database at {host}:{port}", file=sys.stderr)
+                print(
+                    f"Timed out waiting for database at {host}:{port}", file=sys.stderr
+                )
                 sys.exit(1)
             time.sleep(interval)
 
