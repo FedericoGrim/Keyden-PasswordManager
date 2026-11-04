@@ -1,4 +1,7 @@
 {
+    "python.analysis.extraPaths": [
+        "password-manager_backend/src"
+    ],
     "yaml.schemas": {
         "file:///c%3A/Users/ASUS%20Rog%20Strix%208760i/.vscode/extensions/continue.continue-1.2.11-win32-x64/config-yaml-schema.json": [
             ".continue/**/*.yaml"

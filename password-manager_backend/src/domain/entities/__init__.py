@@ -3,8 +3,8 @@ from domain.entities.sub_account import SubAccount
 from domain.entities.team import Team
 from domain.entities.team_perm_level import TeamPermLevel
 from domain.entities.team_member import TeamMember
-from domain.entities.user_teams_keys import UserTeamsKeys
-from domain.entities.categories import Categories
+from domain.entities.user_teams_keys import UserTeamKey
+from domain.entities.categories import Category
 from domain.entities.sub_account_categories import SubAccountCategories
 from domain.entities.user_favorite import UserFavorite
 from domain.entities.sub_account_history import SubAccountHistory

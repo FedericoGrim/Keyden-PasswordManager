@@ -6,7 +6,7 @@ from infrastructure.databases.user_postgreSQL import UserService
 from infrastructure.databases.suc_account_postgreSQL import SubAccountService
 from infrastructure.databases.team_postgreSQL import TeamService
 from infrastructure.databases.team_member_postgreSQL import TeamMembersService
-from infrastructure.databases.user_teams_keys_postgreSQL import UserTeamsKeysService
+from infrastructure.databases.user_teams_keys_postgreSQL import UserTeamKeyService
 from infrastructure.databases.categories_postgresql import CategoriesService
 from infrastructure.databases.sub_account_categories_postgresql import SubAccountCategoriesService
 from infrastructure.databases.team_perm_levels_postgresql import TeamPermLevelsService
@@ -55,12 +55,12 @@ from application.use_case.team_member_use_case import (
 )
 
 from application.use_case.user_teams_keys_use_case import (
-    AddUserTeamsKeyUseCase,
-    GetUserTeamsKeyByIdUseCase,
-    GetUserTeamsKeysByTeamIdUseCase,
-    GetUserTeamsKeysByUserIdUseCase,
-    UpdateUserTeamsKeyUseCase,
-    RemoveUserTeamsKeyUseCase
+    AddUserTeamKeyUseCase,
+    GetUserTeamKeyByIdUseCase,
+    GetUserTeamKeysByTeamIdUseCase,
+    GetUserTeamKeysByUserIdUseCase,
+    UpdateUserTeamKeyUseCase,
+    RemoveUserTeamKeyUseCase
 )
 
 from application.use_case.categories_use_case import (
@@ -97,7 +97,7 @@ class UserContainer(containers.DeclarativeContainer):
     TeamRepositoryFactory = providers.Factory(TeamService, db=providers.Dependency())
     TeamPermLevelRepositoryFactory = providers.Factory(TeamPermLevelsService, db=providers.Dependency())
     TeamMembersRepositoryFactory = providers.Factory(TeamMembersService, db=providers.Dependency())
-    UserTeamsKeysRepositoryFactory = providers.Factory(UserTeamsKeysService, db=providers.Dependency())
+    UserTeamKeyRepositoryFactory = providers.Factory(UserTeamKeyService, db=providers.Dependency())
 
     CreateUserProvider = providers.Factory(
         CreateUserUseCase,
@@ -105,7 +105,7 @@ class UserContainer(containers.DeclarativeContainer):
         TeamRepository=TeamRepositoryFactory,
         TeamPermLevelRepository=TeamPermLevelRepositoryFactory,
         TeamMembersRepository=TeamMembersRepositoryFactory,
-        UserTeamsKeysRepository=UserTeamsKeysRepositoryFactory,
+        UserTeamKeyRepository=UserTeamKeyRepositoryFactory,
     )
     GetUserByKeycloakIdProvider = providers.Factory(
         GetUserByKeycloakIdUseCase,
@@ -224,36 +224,36 @@ class TeamMembersContainer(containers.DeclarativeContainer):
         TeamMembersRepository=TeamMembersRepositoryFactory,
     )
 
-class UserTeamsKeysContainer(containers.DeclarativeContainer):
-    UserTeamsKeysRepositoryFactory = providers.Factory(UserTeamsKeysService, db=providers.Dependency())
+class UserTeamKeyContainer(containers.DeclarativeContainer):
+    UserTeamKeyRepositoryFactory = providers.Factory(UserTeamKeyService, db=providers.Dependency())
 
-    AddUserTeamsKeyProvider = providers.Factory(
-        AddUserTeamsKeyUseCase,
-        UserTeamsKeysRepository=UserTeamsKeysRepositoryFactory,
+    AddUserTeamKeyProvider = providers.Factory(
+        AddUserTeamKeyUseCase,
+        UserTeamKeyRepository=UserTeamKeyRepositoryFactory,
     )
 
-    GetUserTeamsKeyByIdProvider = providers.Factory(
-        GetUserTeamsKeyByIdUseCase,
-        UserTeamsKeysRepository=UserTeamsKeysRepositoryFactory,
+    GetUserTeamKeyByIdProvider = providers.Factory(
+        GetUserTeamKeyByIdUseCase,
+        UserTeamKeyRepository=UserTeamKeyRepositoryFactory,
     )
 
-    GetUserTeamsKeysByTeamIdProvider = providers.Factory(
-        GetUserTeamsKeysByTeamIdUseCase,
-        UserTeamsKeysRepository=UserTeamsKeysRepositoryFactory,
+    GetUserTeamKeysByTeamIdProvider = providers.Factory(
+        GetUserTeamKeysByTeamIdUseCase,
+        UserTeamKeyRepository=UserTeamKeyRepositoryFactory,
     )
 
-    GetUserTeamsKeysByUserIdProvider = providers.Factory(
-        GetUserTeamsKeysByUserIdUseCase,
-        UserTeamsKeysRepository=UserTeamsKeysRepositoryFactory,
+    GetUserTeamKeysByUserIdProvider = providers.Factory(
+        GetUserTeamKeysByUserIdUseCase,
+        UserTeamKeyRepository=UserTeamKeyRepositoryFactory,
     )
 
-    UpdateUserTeamsKeyProvider = providers.Factory(
-        UpdateUserTeamsKeyUseCase,
-        UserTeamsKeysRepository=UserTeamsKeysRepositoryFactory,
+    UpdateUserTeamKeyProvider = providers.Factory(
+        UpdateUserTeamKeyUseCase,
+        UserTeamKeyRepository=UserTeamKeyRepositoryFactory,
     )
-    RemoveUserTeamsKeyProvider = providers.Factory(
-        RemoveUserTeamsKeyUseCase,
-        UserTeamsKeysRepository=UserTeamsKeysRepositoryFactory,
+    RemoveUserTeamKeyProvider = providers.Factory(
+        RemoveUserTeamKeyUseCase,
+        UserTeamKeyRepository=UserTeamKeyRepositoryFactory,
     )
 
 class CategoriesContainer(containers.DeclarativeContainer):
@@ -339,7 +339,7 @@ class Container(containers.DeclarativeContainer):
     subaccount = providers.Container(SubAccountContainer)
     team = providers.Container(TeamContainer)
     team_members = providers.Container(TeamMembersContainer)
-    user_teams_keys = providers.Container(UserTeamsKeysContainer)
+    user_teams_keys = providers.Container(UserTeamKeyContainer)
     categories = providers.Container(CategoriesContainer)
     sub_account_categories = providers.Container(SubAccountCategoriesContainer)
     team_perm_levels = providers.Container(TeamPermLevelsContainer)

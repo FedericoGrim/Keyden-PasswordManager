@@ -9,7 +9,7 @@ class CreateCategoriesUseCase:
     def __init__(self, CategoriesRepository: ICategoriesService):
         self.CategoriesRepository = CategoriesRepository
 
-    def execute(self, category: CreateCategoryDTO, user_interactor_id: uuid.UUID) -> CategoriesDTO:
+    def execute(self, category: CreateCategoryDTO, user_interactor_id: uuid.UUID) -> CategoryDTO:
         try:
             category_entity = category.to_entity()
             result = self.CategoriesRepository.CreateCategory(category_entity)
@@ -23,11 +23,11 @@ class GetAllCategoriesByTeamIdUseCase:
     def __init__(self, CategoriesRepository: ICategoriesService):
         self.CategoriesRepository = CategoriesRepository
 
-    def execute(self, teamId: uuid.UUID) -> list[CategoriesDTO]:
+    def execute(self, teamId: uuid.UUID) -> list[CategoryDTO]:
         try:
             categories = self.CategoriesRepository.GetAllCategoriesByTeamId(teamId)
             return [
-                CategoriesDTO(
+                CategoryDTO(
                     id=uuid.UUID(str(category.id)),
                     team_id=uuid.UUID(str(category.team_id)),
                     name=str(category.name)
@@ -45,7 +45,7 @@ class UpdateCategoryByIdUseCase:
         try:
             result = self.CategoriesRepository.UpdateCategoryById(categoryId, new_category.to_entity())
 
-            return CategoriesDTO(
+            return CategoryDTO(
                 id=uuid.UUID(str(result.id)),
                 team_id=uuid.UUID(str(result.team_id)),
                 name=str(result.name)

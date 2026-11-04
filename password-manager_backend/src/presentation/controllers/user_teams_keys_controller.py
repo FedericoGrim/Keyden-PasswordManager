@@ -6,7 +6,7 @@ from config import Container
 
 from infrastructure.databases.database import get_db
 
-from application.dto.user_teams_keys_dto import UserTeamsKeyDTO, CreateUserTeamsKeyDTO, UpdateUserTeamsKeyDTO, RemoveUserTeamsKeyDTO
+from application.dto.user_teams_keys_dto import UserTeamKeyDTO, CreateUserTeamKeyDTO, UpdateUserTeamKeyDTO, RemoveUserTeamKeyDTO
 
 router = APIRouter()
 
@@ -14,17 +14,17 @@ router = APIRouter()
 
 async def api_add_user_teams_key(
     interactor_id: uuid.UUID,
-    CreateUserTeamsKeyDTO: CreateUserTeamsKeyDTO,
+    CreateUserTeamKeyDTO: CreateUserTeamKeyDTO,
     request: Request,
     db: Session = Depends(get_db),
-) -> dict[str, str | UserTeamsKeyDTO]:
+) -> dict[str, str | UserTeamKeyDTO]:
     container: Container = request.app.state.container
-    add_key_use_case = container.user_teams_keys().AddUserTeamsKeyProvider(
-        UserTeamsKeysRepository__db=db,
+    add_key_use_case = container.user_teams_keys().AddUserTeamKeyProvider(
+        UserTeamKeyRepository__db=db,
     )
 
     try:
-        user_teams_key = add_key_use_case.execute(interactor_id, CreateUserTeamsKeyDTO)
+        user_teams_key = add_key_use_case.execute(interactor_id, CreateUserTeamKeyDTO)
         return {"message": "Key added successfully", "user_teams_key": user_teams_key}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -35,10 +35,10 @@ async def api_get_user_teams_key_by_id(
     key_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-) -> dict[str, str | UserTeamsKeyDTO]:
+) -> dict[str, str | UserTeamKeyDTO]:
     container: Container = request.app.state.container
-    get_key_use_case = container.user_teams_keys().GetUserTeamsKeyByIdProvider(
-        UserTeamsKeysRepository__db=db
+    get_key_use_case = container.user_teams_keys().GetUserTeamKeyByIdProvider(
+        UserTeamKeyRepository__db=db
     )
 
     try:
@@ -53,10 +53,10 @@ async def api_get_user_teams_keys_by_team_id(
     team_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-) -> dict[str, str | list[UserTeamsKeyDTO]]:
+) -> dict[str, str | list[UserTeamKeyDTO]]:
     container: Container = request.app.state.container
-    get_keys_use_case = container.user_teams_keys().GetUserTeamsKeysByTeamIdProvider(
-        UserTeamsKeysRepository__db=db
+    get_keys_use_case = container.user_teams_keys().GetUserTeamKeysByTeamIdProvider(
+        UserTeamKeyRepository__db=db
     )
 
     try:
@@ -71,10 +71,10 @@ async def api_get_user_teams_keys_by_user_id(
     user_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-) -> dict[str, str | list[UserTeamsKeyDTO]]:
+) -> dict[str, str | list[UserTeamKeyDTO]]:
     container: Container = request.app.state.container
-    get_keys_use_case = container.user_teams_keys().GetUserTeamsKeysByUserIdProvider(
-        UserTeamsKeysRepository__db=db
+    get_keys_use_case = container.user_teams_keys().GetUserTeamKeysByUserIdProvider(
+        UserTeamKeyRepository__db=db
     )
 
     try:
@@ -87,13 +87,13 @@ async def api_get_user_teams_keys_by_user_id(
 
 async def api_update_user_teams_key(
     interactor_id: uuid.UUID,
-    new_key_data: UpdateUserTeamsKeyDTO,
+    new_key_data: UpdateUserTeamKeyDTO,
     request: Request,
     db: Session = Depends(get_db),
-) -> dict[str, str | UserTeamsKeyDTO]:
+) -> dict[str, str | UserTeamKeyDTO]:
     container: Container = request.app.state.container
-    update_key_use_case = container.user_teams_keys().UpdateUserTeamsKeyProvider(
-        UserTeamsKeysRepository__db=db,
+    update_key_use_case = container.user_teams_keys().UpdateUserTeamKeyProvider(
+        UserTeamKeyRepository__db=db,
     )
 
     try:
@@ -106,13 +106,13 @@ async def api_update_user_teams_key(
 
 async def api_remove_user_teams_key(
     interactor_id: uuid.UUID,
-    key_to_delete: RemoveUserTeamsKeyDTO,
+    key_to_delete: RemoveUserTeamKeyDTO,
     request: Request,
     db: Session = Depends(get_db),
 ):
     container: Container = request.app.state.container
-    remove_key_use_case = container.user_teams_keys().RemoveUserTeamsKeyProvider(
-        UserTeamsKeysRepository__db=db,
+    remove_key_use_case = container.user_teams_keys().RemoveUserTeamKeyProvider(
+        UserTeamKeyRepository__db=db,
     )
 
     try:

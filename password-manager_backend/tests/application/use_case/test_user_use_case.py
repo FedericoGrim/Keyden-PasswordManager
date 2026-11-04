@@ -27,7 +27,7 @@ from domain.interfaces.user_service_interface import IUserService
 from domain.interfaces.team_service_interface import ITeamService
 from domain.interfaces.team_perm_level_service_interface import ITeamPermLevelService
 from domain.interfaces.team_member_service_interface import ITeamMembersService
-from domain.interfaces.user_teams_keys_service_interface import IUserTeamsKeysService
+from domain.interfaces.user_teams_keys_service_interface import IUserTeamKeyService
 
 
 def make_user(**overrides):
@@ -53,7 +53,7 @@ def repos():
         team=MagicMock(spec=ITeamService),
         team_perm_level=MagicMock(spec=ITeamPermLevelService),
         team_members=MagicMock(spec=ITeamMembersService),
-        user_teams_keys=MagicMock(spec=IUserTeamsKeysService),
+        user_teams_keys=MagicMock(spec=IUserTeamKeyService),
     )
 
 
@@ -72,7 +72,7 @@ class TestCreateUserUseCase:
             TeamRepository=repos["team"],
             TeamPermLevelRepository=repos["team_perm_level"],
             TeamMembersRepository=repos["team_members"],
-            UserTeamsKeysRepository=repos["user_teams_keys"],
+            UserTeamKeyRepository=repos["user_teams_keys"],
         )
         dto = CreateUserDTO(
             id=user.id, keycloak_id=user.keycloak_id, username="alice", code="ABC1234567",
@@ -114,7 +114,7 @@ class TestCreateUserUseCase:
             TeamRepository=repos["team"],
             TeamPermLevelRepository=repos["team_perm_level"],
             TeamMembersRepository=repos["team_members"],
-            UserTeamsKeysRepository=repos["user_teams_keys"],
+            UserTeamKeyRepository=repos["user_teams_keys"],
         )
         dto = CreateUserDTO(
             id=uuid.uuid4(), keycloak_id=uuid.uuid4(), username="alice", code="ABC1234567",

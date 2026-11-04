@@ -23,12 +23,12 @@ from domain.interfaces.sub_account_history_service_interface import ISubAccountH
 
 
 @pytest.fixture
-def repo():
+def repo() -> MagicMock:
     return MagicMock(spec=ISubAccountService)
 
 
 @pytest.fixture
-def history_repo():
+def history_repo() -> MagicMock:
     return MagicMock(spec=ISubAccountHistoryService)
 
 
@@ -48,7 +48,7 @@ def make_sub_account(**overrides):
 
 
 class TestCreateSubAccountUseCase:
-    def test_creates_and_returns_repository_result(self, repo):
+    def test_creates_and_returns_repository_result(self, repo: MagicMock):
         created = make_sub_account()
         repo.CreateSubAccount.return_value = created
 
@@ -70,7 +70,7 @@ class TestCreateSubAccountUseCase:
         assert isinstance(passed_entity, SubAccount)
         assert passed_entity.team_id == created.team_id
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock):
         repo.CreateSubAccount.side_effect = Exception("db exploded")
         dto = CreateSubAccountDTO(
             team_id=uuid.uuid4(),
@@ -89,7 +89,7 @@ class TestCreateSubAccountUseCase:
 
 
 class TestGetSubAccountByIdUseCase:
-    def test_returns_repository_result(self, repo):
+    def test_returns_repository_result(self, repo: MagicMock):
         found = make_sub_account()
         repo.GetSubAccountById.return_value = found
 
@@ -98,7 +98,7 @@ class TestGetSubAccountByIdUseCase:
         assert result is found
         repo.GetSubAccountById.assert_called_once_with(found.id)
 
-    def test_wraps_not_found_error(self, repo):
+    def test_wraps_not_found_error(self, repo: MagicMock):
         repo.GetSubAccountById.side_effect = Exception("not found")
 
         with pytest.raises(SubAccountRetrievalException):
@@ -106,7 +106,7 @@ class TestGetSubAccountByIdUseCase:
 
 
 class TestGetAllSubAccountsByTeamIdUseCase:
-    def test_maps_entities_to_dtos(self, repo):
+    def test_maps_entities_to_dtos(self, repo: MagicMock):
         team_id = uuid.uuid4()
         entities = [make_sub_account(team_id=team_id), make_sub_account(team_id=team_id)]
         repo.GetAllSubAccountsByTeamId.return_value = entities
@@ -117,7 +117,7 @@ class TestGetAllSubAccountsByTeamIdUseCase:
         assert {dto.id for dto in result} == {e.id for e in entities}
         assert all(dto.team_id == team_id for dto in result)
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock):
         repo.GetAllSubAccountsByTeamId.side_effect = Exception("boom")
 
         with pytest.raises(SubAccountRetrievalException):
@@ -125,7 +125,7 @@ class TestGetAllSubAccountsByTeamIdUseCase:
 
 
 class TestUpdateSubAccountByIdUseCase:
-    def test_merges_into_existing_and_returns_dto(self, repo, history_repo):
+    def test_merges_into_existing_and_returns_dto(self, repo: MagicMock, history_repo: MagicMock):
         existing = make_sub_account(username_encrypted="old-user")
         updated = make_sub_account(id=existing.id, team_id=existing.team_id, username_encrypted="new-user")
         repo.GetSubAccountById.return_value = existing
@@ -147,7 +147,7 @@ class TestUpdateSubAccountByIdUseCase:
         repo.GetSubAccountById.assert_called_once_with(existing.id)
         history_repo.CreateHistoryEntry.assert_called_once()
 
-    def test_wraps_repository_errors(self, repo, history_repo):
+    def test_wraps_repository_errors(self, repo: MagicMock, history_repo: MagicMock):
         repo.GetSubAccountById.side_effect = Exception("missing")
         dto = UpdateSubAccountDTO(
             id=uuid.uuid4(),
@@ -163,7 +163,7 @@ class TestUpdateSubAccountByIdUseCase:
 
 
 class TestDeleteSubAccountByIdUseCase:
-    def test_returns_repository_result(self, repo):
+    def test_returns_repository_result(self, repo: MagicMock):
         repo.DeleteSubAccountById.return_value = {"message": "SubAccount deleted successfully."}
         sub_account_id = uuid.uuid4()
 
@@ -172,7 +172,7 @@ class TestDeleteSubAccountByIdUseCase:
         assert result == {"message": "SubAccount deleted successfully."}
         repo.DeleteSubAccountById.assert_called_once_with(sub_account_id)
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock):
         repo.DeleteSubAccountById.side_effect = Exception("cannot delete")
 
         with pytest.raises(SubAccountDeletionException):

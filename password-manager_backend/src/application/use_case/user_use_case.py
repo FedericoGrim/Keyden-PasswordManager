@@ -7,11 +7,11 @@ from domain.interfaces.user_service_interface import IUserService
 from domain.interfaces.team_service_interface import ITeamService
 from domain.interfaces.team_perm_level_service_interface import ITeamPermLevelService
 from domain.interfaces.team_member_service_interface import ITeamMembersService
-from domain.interfaces.user_teams_keys_service_interface import IUserTeamsKeysService
+from domain.interfaces.user_teams_keys_service_interface import IUserTeamKeyService
 from domain.entities.team import Team
 from domain.entities.team_perm_level import TeamPermLevel
 from domain.entities.team_member import TeamMember
-from domain.entities.user_teams_keys import UserTeamsKeys
+from domain.entities.user_teams_keys import UserTeamKey
 
 PERSONAL_TEAM_NAME = "Me"
 PERSONAL_TEAM_OWNER_PERM_LEVEL_NAME = "Owner"
@@ -24,13 +24,13 @@ class CreateUserUseCase:
         TeamRepository: ITeamService,
         TeamPermLevelRepository: ITeamPermLevelService,
         TeamMembersRepository: ITeamMembersService,
-        UserTeamsKeysRepository: IUserTeamsKeysService,
+        UserTeamKeyRepository: IUserTeamKeyService,
     ):
         self.user_repository = UserRepository
         self.team_repository = TeamRepository
         self.team_perm_level_repository = TeamPermLevelRepository
         self.team_members_repository = TeamMembersRepository
-        self.user_teams_keys_repository = UserTeamsKeysRepository
+        self.user_teams_keys_repository = UserTeamKeyRepository
 
     async def execute(self, user_create: CreateUserDTO) -> UserDTO:
         try:
@@ -55,7 +55,7 @@ class CreateUserUseCase:
                 )
             )
             self.user_teams_keys_repository.add_key(
-                UserTeamsKeys(
+                UserTeamKey(
                     user_id=user.id,
                     team_id=personal_team.id,
                     team_key_encrypted=user_create.team_key_encrypted,

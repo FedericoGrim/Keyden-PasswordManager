@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from infrastructure.databases.base import Base
 
 
-class UserTeamsKeysModel(Base):
+class UserTeamKeyModel(Base):
     __tablename__ = "user_teams_keys"
     __table_args__ = (
         UniqueConstraint('team_id', 'user_id', name='uq_user_teams_keys_team_id_user_id'),

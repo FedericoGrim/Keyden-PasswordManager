@@ -94,7 +94,7 @@ app.include_router(
 app.include_router(
     user_teams_keys_router,
     prefix="/api/user-teams-keys",
-    tags=["UserTeamsKeys"],
+    tags=["UserTeamKey"],
     dependencies=[Depends(jwt_authentication)],
 )
 

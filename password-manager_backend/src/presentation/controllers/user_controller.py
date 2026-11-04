@@ -25,7 +25,7 @@ async def create_user(
         TeamRepository__db=db,
         TeamPermLevelRepository__db=db,
         TeamMembersRepository__db=db,
-        UserTeamsKeysRepository__db=db,
+        UserTeamKeyRepository__db=db,
     )
     try:
         created_user: UserDTO = await create_user_use_case.execute(user_data)

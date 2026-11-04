@@ -6,7 +6,7 @@ from config import Container
 
 from infrastructure.databases.database import get_db
 
-from application.dto.categories_dto import CreateCategoryDTO, UpdateCategoryDTO
+from application.dto.categories_dto import CreateCategoryDTO, UpdateCategoryDTO, CategoryDTO
 
 router = APIRouter()
 
@@ -17,7 +17,7 @@ async def CreateCategory(
     user_interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> tuple[str, CategoryDTO]:
     container: Container = request.app.state.container
     create_category_use_case = container.categories().CreateCategoriesProvider(
         CategoriesRepository__db=db,

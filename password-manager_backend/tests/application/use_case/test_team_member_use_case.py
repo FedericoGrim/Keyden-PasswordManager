@@ -23,7 +23,7 @@ from domain.interfaces.team_member_service_interface import ITeamMembersService
 
 
 @pytest.fixture
-def repo():
+def repo() -> MagicMock:
     return MagicMock(spec=ITeamMembersService)
 
 
@@ -34,7 +34,7 @@ def make_member(**overrides):
 
 
 class TestAddMemberToTeamUseCase:
-    def test_returns_dto_from_repository_result(self, repo):
+    def test_returns_dto_from_repository_result(self, repo: MagicMock):
         member = make_member()
         repo.add_member_to_team.return_value = member
 
@@ -44,7 +44,7 @@ class TestAddMemberToTeamUseCase:
         assert result.id == member.id
         assert result.user_id == member.user_id
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock):
         repo.add_member_to_team.side_effect = Exception("already a member")
         dto = CreateTeamMemberDTO(user_id=uuid.uuid4(), team_id=uuid.uuid4(), perm_level_id=uuid.uuid4())
 
@@ -53,7 +53,7 @@ class TestAddMemberToTeamUseCase:
 
 
 class TestGetTeamMemberByIdUseCase:
-    def test_returns_dto(self, repo):
+    def test_returns_dto(self, repo: MagicMock):
         member = make_member()
         repo.get_team_member_by_id.return_value = member
 
@@ -61,7 +61,7 @@ class TestGetTeamMemberByIdUseCase:
 
         assert result.id == member.id
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock):
         repo.get_team_member_by_id.side_effect = Exception("not found")
 
         with pytest.raises(TeamMemberRetrievalByIdException):
@@ -69,7 +69,7 @@ class TestGetTeamMemberByIdUseCase:
 
 
 class TestGetTeamMembersByTeamIdUseCase:
-    def test_maps_entities_to_dtos(self, repo):
+    def test_maps_entities_to_dtos(self, repo: MagicMock):
         team_id = uuid.uuid4()
         members = [make_member(team_id=team_id), make_member(team_id=team_id)]
         repo.get_members_by_team_id.return_value = members
@@ -78,7 +78,7 @@ class TestGetTeamMembersByTeamIdUseCase:
 
         assert len(result) == 2
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock):
         repo.get_members_by_team_id.side_effect = Exception("boom")
 
         with pytest.raises(TeamMembersRetrievalByTeamIdException):
@@ -86,7 +86,7 @@ class TestGetTeamMembersByTeamIdUseCase:
 
 
 class TestUpdateTeamMemberRoleUseCase:
-    def test_looks_up_existing_member_then_updates(self, repo):
+    def test_looks_up_existing_member_then_updates(self, repo: MagicMock):
         existing = make_member()
         new_perm_level_id = uuid.uuid4()
         updated = make_member(id=existing.id, team_id=existing.team_id, user_id=existing.user_id, perm_level_id=new_perm_level_id)
@@ -99,7 +99,7 @@ class TestUpdateTeamMemberRoleUseCase:
         assert result.perm_level_id == new_perm_level_id
         repo.get_team_member_by_id.assert_called_once_with(existing.user_id)
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock):
         repo.get_team_member_by_id.side_effect = Exception("missing")
         dto = UpdateTeamMemberDTO(user_id=uuid.uuid4(), team_id=uuid.uuid4(), perm_level_id=uuid.uuid4())
 
@@ -108,7 +108,7 @@ class TestUpdateTeamMemberRoleUseCase:
 
 
 class TestRemoveMemberFromTeamUseCase:
-    def test_returns_repository_result(self, repo):
+    def test_returns_repository_result(self, repo: MagicMock):
         repo.remove_member_from_team.return_value = {"message": "Member removed from team successfully."}
         member_id, team_id = uuid.uuid4(), uuid.uuid4()
 
@@ -117,7 +117,7 @@ class TestRemoveMemberFromTeamUseCase:
         assert result == {"message": "Member removed from team successfully."}
         repo.remove_member_from_team.assert_called_once_with(member_id=member_id, team_id=team_id)
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock):
         repo.remove_member_from_team.side_effect = Exception("not in team")
 
         with pytest.raises(TeamMemberRemovalException):
