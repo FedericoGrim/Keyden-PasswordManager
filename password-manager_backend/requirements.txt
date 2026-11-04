@@ -25,6 +25,11 @@ dependency_injector
 pytest
 pytest-asyncio
 
+#Type checking & linting
+pyright
+ruff
+types-python-jose
+
 #Migration SQL
 alembic
 
