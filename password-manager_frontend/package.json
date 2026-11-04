@@ -30,9 +30,9 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@typescript-eslint/eslint-plugin": "^8.72.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
     "@typescript-eslint/parser": "^8.72.0",
-    "eslint": "^10.13.0",
+    "eslint": "^10.14.0",
     "eslint-config-next": "^16.4.3",
     "tailwindcss": "^4",
     "typescript": "^5"
