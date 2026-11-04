@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import RequestResponseEndpoint
 
 from config import Container
-from infrastructure.keycloak.jwt_token_autentication import jwt_authentication
+from infrastructure.auth.oidc_authentication import jwt_authentication
 from presentation.controllers.user_controller import router as user_router
 from presentation.controllers.sub_account_controller import router as subaccount_router
 from presentation.controllers.team_controller import router as team_router
