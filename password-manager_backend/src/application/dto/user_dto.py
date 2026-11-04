@@ -5,9 +5,10 @@ from uuid import UUID
 from domain.entities.user import User
 from domain.generate_user_code import USER_CODE_LENGTH
 
+
 class UserDTO(BaseModel):
-    id: UUID
-    keycloak_id: UUID
+    id: UUID | None
+    keycloak_id: UUID | None
 
     username: str
     code: str
@@ -45,11 +46,17 @@ class UserDTO(BaseModel):
             public_key_pq=self.public_key_pq,
             private_key_pq=self.private_key_pq,
         )
+
+
 class CreateUserDTO(BaseModel):
     id: UUID
     keycloak_id: UUID
     username: str
-    code: str = Field(min_length=USER_CODE_LENGTH, max_length=USER_CODE_LENGTH, pattern=r'^[A-Za-z0-9]+$')
+    code: str = Field(
+        min_length=USER_CODE_LENGTH,
+        max_length=USER_CODE_LENGTH,
+        pattern=r"^[A-Za-z0-9]+$",
+    )
 
     salt: str
 
@@ -61,7 +68,7 @@ class CreateUserDTO(BaseModel):
 
     team_key_encrypted: str
 
-    def to_entity(self):
+    def to_entity(self) -> User:
         return User(
             id=self.id,
             keycloak_id=self.keycloak_id,
@@ -74,8 +81,9 @@ class CreateUserDTO(BaseModel):
             private_key_pq=self.private_key_pq,
         )
 
+
 class UserPublicDTO(BaseModel):
-    id: UUID
+    id: UUID | None
     username: str
     code: str
 
@@ -92,6 +100,7 @@ class UserPublicDTO(BaseModel):
             public_key_pq=entity.public_key_pq,
         )
 
+
 class UpdateUserDTO(BaseModel):
     keycloak_id: Optional[UUID]
     username: Optional[str]
@@ -104,15 +113,27 @@ class UpdateUserDTO(BaseModel):
     public_key_pq: Optional[bytes]
     private_key_pq: Optional[bytes]
 
-    def to_entity(self, existing_user: User):
+    def to_entity(self, existing_user: User) -> User:
         return User(
             id=existing_user.id,
-            keycloak_id=self.keycloak_id if self.keycloak_id is not None else existing_user.keycloak_id,
-            username=self.username if self.username is not None else existing_user.username,
+            keycloak_id=self.keycloak_id
+            if self.keycloak_id is not None
+            else existing_user.keycloak_id,
+            username=self.username
+            if self.username is not None
+            else existing_user.username,
             code=existing_user.code,
             salt=self.salt if self.salt is not None else existing_user.salt,
-            public_key_ec=self.public_key_ec if self.public_key_ec is not None else existing_user.public_key_ec,
-            private_key_ec=self.private_key_ec if self.private_key_ec is not None else existing_user.private_key_ec,
-            public_key_pq=self.public_key_pq if self.public_key_pq is not None else existing_user.public_key_pq,
-            private_key_pq=self.private_key_pq if self.private_key_pq is not None else existing_user.private_key_pq,
+            public_key_ec=self.public_key_ec
+            if self.public_key_ec is not None
+            else existing_user.public_key_ec,
+            private_key_ec=self.private_key_ec
+            if self.private_key_ec is not None
+            else existing_user.private_key_ec,
+            public_key_pq=self.public_key_pq
+            if self.public_key_pq is not None
+            else existing_user.public_key_pq,
+            private_key_pq=self.private_key_pq
+            if self.private_key_pq is not None
+            else existing_user.private_key_pq,
         )

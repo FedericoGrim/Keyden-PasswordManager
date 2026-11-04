@@ -1,0 +1,8 @@
+{
+  "include": ["password-manager_backend/src", "password-manager_backend/tests"],
+  "exclude": ["**/__pycache__", "password-manager_backend/migrations"],
+  "extraPaths": ["password-manager_backend/src"],
+  "venvPath": ".",
+  "venv": ".venv",
+  "typeCheckingMode": "strict"
+}

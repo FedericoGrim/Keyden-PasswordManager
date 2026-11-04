@@ -12,11 +12,19 @@ class SubAccountModel(Base):
 
     __tablename__ = "sub_accounts"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-    team_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("teams.id", ondelete="CASCADE"), nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False
+    )
+    team_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("teams.id", ondelete="CASCADE"), nullable=False
+    )
     username_encrypted: Mapped[str | None] = mapped_column(String(100), nullable=True)
     email_encrypted: Mapped[str | None] = mapped_column(String(255), nullable=True)
     password_encrypted: Mapped[str] = mapped_column(String, nullable=False)
     site_link_encrypted: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    required_perm_level_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("team_perm_levels.id", ondelete="CASCADE"), nullable=False)
+    required_perm_level_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("team_perm_levels.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     dek_wrapped: Mapped[str | None] = mapped_column(String, nullable=True)

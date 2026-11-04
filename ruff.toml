@@ -1,0 +1,4 @@
+extend-exclude = ["password-manager_backend/migrations"]
+
+[lint]
+select = ["E", "F", "ANN"]

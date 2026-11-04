@@ -23,41 +23,46 @@ from domain.interfaces.team_service_interface import ITeamService
 
 
 @pytest.fixture
-def repo():
+def repo() -> MagicMock:
     return MagicMock(spec=ITeamService)
 
 
 class TestCreateTeamUseCase:
-    def test_creates_and_returns_repository_result(self, repo):
+    def test_creates_and_returns_repository_result(self, repo: MagicMock) -> None:
         created = Team(id=uuid.uuid4(), name="Engineering", is_personal=False)
         repo.CreateTeam.return_value = created
 
-        result = CreateTeamUseCase(repo).execute(uuid.uuid4(), CreateTeamDTO(name="Engineering"))
+        result = CreateTeamUseCase(repo).execute(
+            uuid.uuid4(), CreateTeamDTO(name="Engineering")
+        )
 
         assert result is created
         passed_entity = repo.CreateTeam.call_args.args[0]
         assert passed_entity.name == "Engineering"
         assert passed_entity.is_personal is False
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.CreateTeam.side_effect = Exception("duplicate")
 
         with pytest.raises(TeamCreationException):
-            CreateTeamUseCase(repo).execute(uuid.uuid4(), CreateTeamDTO(name="Engineering"))
+            CreateTeamUseCase(repo).execute(
+                uuid.uuid4(), CreateTeamDTO(name="Engineering")
+            )
 
 
 class TestGetTeamByIdUseCase:
-    def test_returns_team_dto(self, repo):
+    def test_returns_team_dto(self, repo: MagicMock) -> None:
         team = Team(id=uuid.uuid4(), name="Engineering", is_personal=False)
         repo.GetTeamById.return_value = team
 
+        assert team.id is not None
         result = GetTeamByIdUseCase(repo).execute(team.id)
 
         assert result.id == team.id
         assert result.name == "Engineering"
         assert result.is_personal is False
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.GetTeamById.side_effect = Exception("not found")
 
         with pytest.raises(TeamRetrievalByIdException):
@@ -65,8 +70,11 @@ class TestGetTeamByIdUseCase:
 
 
 class TestGetTeamsByUserIdUseCase:
-    def test_maps_entities_to_dtos(self, repo):
-        teams = [Team(id=uuid.uuid4(), name="Me", is_personal=True), Team(id=uuid.uuid4(), name="Work", is_personal=False)]
+    def test_maps_entities_to_dtos(self, repo: MagicMock) -> None:
+        teams = [
+            Team(id=uuid.uuid4(), name="Me", is_personal=True),
+            Team(id=uuid.uuid4(), name="Work", is_personal=False),
+        ]
         repo.GetTeamsByUserId.return_value = teams
 
         result = GetTeamsByUserIdUseCase(repo).execute(uuid.uuid4())
@@ -74,7 +82,7 @@ class TestGetTeamsByUserIdUseCase:
         assert len(result) == 2
         assert {dto.name for dto in result} == {"Me", "Work"}
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.GetTeamsByUserId.side_effect = Exception("none found")
 
         with pytest.raises(TeamsRetrievalByUserIdException):
@@ -82,12 +90,13 @@ class TestGetTeamsByUserIdUseCase:
 
 
 class TestUpdateTeamByIdUseCase:
-    def test_merges_into_existing_and_returns_dto(self, repo):
+    def test_merges_into_existing_and_returns_dto(self, repo: MagicMock) -> None:
         existing = Team(id=uuid.uuid4(), name="Old Name", is_personal=False)
         updated = Team(id=existing.id, name="New Name", is_personal=False)
         repo.GetTeamById.return_value = existing
         repo.UpdateTeamById.return_value = updated
 
+        assert existing.id is not None
         dto = UpdateTeamDTO(id=existing.id, name="New Name")
 
         result = UpdateTeamByIdUseCase(repo).execute(uuid.uuid4(), dto)
@@ -95,23 +104,27 @@ class TestUpdateTeamByIdUseCase:
         assert result.name == "New Name"
         repo.GetTeamById.assert_called_once_with(existing.id)
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.GetTeamById.side_effect = Exception("missing")
 
         with pytest.raises(TeamUpdateException):
-            UpdateTeamByIdUseCase(repo).execute(uuid.uuid4(), UpdateTeamDTO(id=uuid.uuid4(), name="X"))
+            UpdateTeamByIdUseCase(repo).execute(
+                uuid.uuid4(), UpdateTeamDTO(id=uuid.uuid4(), name="X")
+            )
 
 
 class TestDeleteTeamByIdUseCase:
-    def test_calls_repository_delete(self, repo):
+    def test_calls_repository_delete(self, repo: MagicMock) -> None:
         team_id = uuid.uuid4()
 
         DeleteTeamByIdUseCase(repo).execute(uuid.uuid4(), DeleteTeamDTO(id=team_id))
 
         repo.DeleteTeamById.assert_called_once_with(team_id)
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.DeleteTeamById.side_effect = Exception("cannot delete")
 
         with pytest.raises(TeamDeleteException):
-            DeleteTeamByIdUseCase(repo).execute(uuid.uuid4(), DeleteTeamDTO(id=uuid.uuid4()))
+            DeleteTeamByIdUseCase(repo).execute(
+                uuid.uuid4(), DeleteTeamDTO(id=uuid.uuid4())
+            )

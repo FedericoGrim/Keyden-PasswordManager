@@ -3,7 +3,14 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.user_postrgreSQL_exceptions import *
+from infrastructure.exceptions.user_postrgreSQL_exceptions import (
+    GetUserByIdRetrivalException,
+    UserAlreadyExistsException,
+    UserCreationFailedException,
+    UserDeleteException,
+    UserNotFoundException,
+    UserUpdateFailedException,
+)
 
 from domain.interfaces.user_service_interface import IUserService
 from domain.entities.user import User
@@ -25,7 +32,7 @@ def _to_domain(model: UserModel) -> User:
 
 
 class UserService(IUserService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.db = db
 
     def create_user(self, new_user: User) -> User:
@@ -57,11 +64,17 @@ class UserService(IUserService):
             logging.error(f"Error: {e}")
             raise UserCreationFailedException()
 
-    def get_user_by_keycloak_id(self, keycloak_user_id: uuid.UUID):
+    def get_user_by_keycloak_id(self, keycloak_user_id: uuid.UUID) -> User:
         try:
-            user_model = self.db.query(UserModel).filter(UserModel.keycloak_id == keycloak_user_id).first()
+            user_model = (
+                self.db.query(UserModel)
+                .filter(UserModel.keycloak_id == keycloak_user_id)
+                .first()
+            )
             if not user_model:
-                raise UserNotFoundException(f"User with keycloak_id {keycloak_user_id} not found.")
+                raise UserNotFoundException(
+                    f"User with keycloak_id {keycloak_user_id} not found."
+                )
             return _to_domain(user_model)
 
         except UserNotFoundException:
@@ -71,11 +84,17 @@ class UserService(IUserService):
             logging.error(f"Error: {e}")
             raise GetUserByIdRetrivalException()
 
-    def get_user_by_username_and_code(self, username: str, code: str):
+    def get_user_by_username_and_code(self, username: str, code: str) -> User:
         try:
-            user_model = self.db.query(UserModel).filter(UserModel.username == username, UserModel.code == code).first()
+            user_model = (
+                self.db.query(UserModel)
+                .filter(UserModel.username == username, UserModel.code == code)
+                .first()
+            )
             if not user_model:
-                raise UserNotFoundException(f"User with username {username} and code {code} not found.")
+                raise UserNotFoundException(
+                    f"User with username {username} and code {code} not found."
+                )
             return _to_domain(user_model)
 
         except UserNotFoundException:
@@ -85,9 +104,11 @@ class UserService(IUserService):
             logging.error(f"Error: {e}")
             raise GetUserByIdRetrivalException()
 
-    def get_user_by_id(self, user_id: uuid.UUID):
+    def get_user_by_id(self, user_id: uuid.UUID) -> User:
         try:
-            user_model = self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            user_model = (
+                self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            )
             if not user_model:
                 raise UserNotFoundException(f"User with id {user_id} not found.")
             return _to_domain(user_model)
@@ -99,9 +120,11 @@ class UserService(IUserService):
             logging.error(f"Error: {e}")
             raise GetUserByIdRetrivalException()
 
-    def update_user_by_id(self, user_id: uuid.UUID, new_user: User):
+    def update_user_by_id(self, user_id: uuid.UUID, new_user: User) -> User:
         try:
-            user_model = self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            user_model = (
+                self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            )
             if not user_model:
                 raise UserNotFoundException("User not found.")
 
@@ -123,7 +146,9 @@ class UserService(IUserService):
 
     def delete_user_by_id(self, user_id: uuid.UUID) -> dict[str, str]:
         try:
-            user_model = self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            user_model = (
+                self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            )
             if not user_model:
                 raise UserNotFoundException("User not found.")
 

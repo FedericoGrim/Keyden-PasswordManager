@@ -19,22 +19,26 @@ from domain.interfaces.user_favorite_service_interface import IUserFavoriteServi
 
 
 @pytest.fixture
-def repo():
+def repo() -> MagicMock:
     return MagicMock(spec=IUserFavoriteService)
 
 
 class TestAddFavoriteUseCase:
-    def test_returns_dto_from_repository_result(self, repo):
-        favorite = UserFavorite(id=uuid.uuid4(), user_id=uuid.uuid4(), sub_account_id=uuid.uuid4())
+    def test_returns_dto_from_repository_result(self, repo: MagicMock) -> None:
+        favorite = UserFavorite(
+            id=uuid.uuid4(), user_id=uuid.uuid4(), sub_account_id=uuid.uuid4()
+        )
         repo.add_favorite.return_value = favorite
 
-        dto = CreateFavoriteDTO(user_id=favorite.user_id, sub_account_id=favorite.sub_account_id)
+        dto = CreateFavoriteDTO(
+            user_id=favorite.user_id, sub_account_id=favorite.sub_account_id
+        )
         result = AddFavoriteUseCase(repo).execute(dto)
 
         assert result.id == favorite.id
         assert result.user_id == favorite.user_id
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.add_favorite.side_effect = Exception("already a favorite")
         dto = CreateFavoriteDTO(user_id=uuid.uuid4(), sub_account_id=uuid.uuid4())
 
@@ -43,7 +47,7 @@ class TestAddFavoriteUseCase:
 
 
 class TestGetFavoritesByUserIdUseCase:
-    def test_maps_entities_to_dtos(self, repo):
+    def test_maps_entities_to_dtos(self, repo: MagicMock) -> None:
         user_id = uuid.uuid4()
         favorites = [
             UserFavorite(id=uuid.uuid4(), user_id=user_id, sub_account_id=uuid.uuid4()),
@@ -56,7 +60,7 @@ class TestGetFavoritesByUserIdUseCase:
         assert len(result) == 2
         assert all(dto.user_id == user_id for dto in result)
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.get_favorites_by_user_id.side_effect = Exception("boom")
 
         with pytest.raises(UserFavoriteRetrievalException):
@@ -64,8 +68,10 @@ class TestGetFavoritesByUserIdUseCase:
 
 
 class TestRemoveFavoriteUseCase:
-    def test_returns_repository_result(self, repo):
-        repo.remove_favorite.return_value = {"message": "Favorite removed successfully."}
+    def test_returns_repository_result(self, repo: MagicMock) -> None:
+        repo.remove_favorite.return_value = {
+            "message": "Favorite removed successfully."
+        }
         user_id, sub_account_id = uuid.uuid4(), uuid.uuid4()
 
         result = RemoveFavoriteUseCase(repo).execute(user_id, sub_account_id)
@@ -73,7 +79,7 @@ class TestRemoveFavoriteUseCase:
         assert result == {"message": "Favorite removed successfully."}
         repo.remove_favorite.assert_called_once_with(user_id, sub_account_id)
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.remove_favorite.side_effect = Exception("not found")
 
         with pytest.raises(UserFavoriteRemovalException):
