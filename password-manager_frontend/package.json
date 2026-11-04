@@ -15,7 +15,7 @@
     "@mui/material": "^9.5.0",
     "argon2-browser": "^1.18.0",
     "axios": "^1.21.0",
-    "keycloak-js": "^26.2.4",
+    "keycloak-js": "^26.2.5",
     "lucide-react": "^1.7.0",
     "mlkem": "^2.7.0",
     "next": "^16.4.3",
