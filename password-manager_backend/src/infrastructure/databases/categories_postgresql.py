@@ -25,8 +25,7 @@ class CategoriesService(ICategoriesService):
     def CreateCategory(self, category: Category) -> Category:
         try:
             category_model = CategoriesModel(
-                team_id = category.team_id,
-                name = category.name
+                team_id=category.team_id, name=category.name
             )
 
             self.Db.add(category_model)
@@ -35,7 +34,9 @@ class CategoriesService(ICategoriesService):
             return _to_domain(category_model)
 
         except IntegrityError:
-            raise CategoryAlreadyExistsException("Category with the same name already exists.")
+            raise CategoryAlreadyExistsException(
+                "Category with the same name already exists."
+            )
 
         except Exception as e:
             logging.error(f"Error: {e}")
@@ -43,18 +44,30 @@ class CategoriesService(ICategoriesService):
 
     def GetAllCategoriesByTeamId(self, teamId: uuid.UUID) -> list[Category]:
         try:
-            category_models: list[CategoriesModel] = self.Db.query(CategoriesModel).filter(CategoriesModel.team_id == teamId).all()
+            category_models: list[CategoriesModel] = (
+                self.Db.query(CategoriesModel)
+                .filter(CategoriesModel.team_id == teamId)
+                .all()
+            )
             if not category_models:
-                raise GetAllCategoriesByTeamIdNotFoundException("No categories found for the given team ID.")
+                raise GetAllCategoriesByTeamIdNotFoundException(
+                    "No categories found for the given team ID."
+                )
             return [_to_domain(category_model) for category_model in category_models]
 
         except Exception as e:
             logging.error(f"Error: {e}")
             raise CategoryRetrievalException("Failed to retrieve categories.")
 
-    def UpdateCategoryById(self, categoryId: uuid.UUID, new_category: Category) -> Category:
+    def UpdateCategoryById(
+        self, categoryId: uuid.UUID, new_category: Category
+    ) -> Category:
         try:
-            category_model = self.Db.query(CategoriesModel).filter(CategoriesModel.id == categoryId).first()
+            category_model = (
+                self.Db.query(CategoriesModel)
+                .filter(CategoriesModel.id == categoryId)
+                .first()
+            )
             if not category_model:
                 raise CategoryNotFoundException("Category not found.")
 
@@ -70,7 +83,11 @@ class CategoriesService(ICategoriesService):
 
     def DeleteCategoryById(self, categoryId: uuid.UUID) -> bool:
         try:
-            category_model = self.Db.query(CategoriesModel).filter(CategoriesModel.id == categoryId).first()
+            category_model = (
+                self.Db.query(CategoriesModel)
+                .filter(CategoriesModel.id == categoryId)
+                .first()
+            )
             if not category_model:
                 raise CategoryNotFoundException("Category not found.")
 

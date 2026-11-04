@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 from domain.entities.categories import Category
 
+
 @abstractmethod
 class ICategoriesService(ABC):
     @abstractmethod
@@ -14,7 +15,9 @@ class ICategoriesService(ABC):
         pass
 
     @abstractmethod
-    def UpdateCategoryById(self, categoryId: uuid.UUID, new_category: Category) -> Category:
+    def UpdateCategoryById(
+        self, categoryId: uuid.UUID, new_category: Category
+    ) -> Category:
         pass
 
     @abstractmethod

@@ -31,7 +31,9 @@ class TestCreateCategoriesUseCase:
         created = Category(id=uuid.uuid4(), team_id=team_id, name="Work")
         repo.CreateCategory.return_value = created
 
-        result = CreateCategoriesUseCase(repo).execute(CreateCategoryDTO(team_id=team_id, name="Work"), uuid.uuid4())
+        result = CreateCategoriesUseCase(repo).execute(
+            CreateCategoryDTO(team_id=team_id, name="Work"), uuid.uuid4()
+        )
 
         assert result is created
 
@@ -39,13 +41,18 @@ class TestCreateCategoriesUseCase:
         repo.CreateCategory.side_effect = Exception("duplicate")
 
         with pytest.raises(CreateCategoryException):
-            CreateCategoriesUseCase(repo).execute(CreateCategoryDTO(team_id=uuid.uuid4(), name="Work"), uuid.uuid4())
+            CreateCategoriesUseCase(repo).execute(
+                CreateCategoryDTO(team_id=uuid.uuid4(), name="Work"), uuid.uuid4()
+            )
 
 
 class TestGetAllCategoriesByTeamIdUseCase:
     def test_maps_entities_to_dtos(self, repo: MagicMock):
         team_id = uuid.uuid4()
-        categories = [Category(id=uuid.uuid4(), team_id=team_id, name="Work"), Category(id=uuid.uuid4(), team_id=team_id, name="Personal")]
+        categories = [
+            Category(id=uuid.uuid4(), team_id=team_id, name="Work"),
+            Category(id=uuid.uuid4(), team_id=team_id, name="Personal"),
+        ]
         repo.GetAllCategoriesByTeamId.return_value = categories
 
         result = GetAllCategoriesByTeamIdUseCase(repo).execute(team_id)
@@ -65,7 +72,9 @@ class TestUpdateCategoryByIdUseCase:
         updated = Category(id=category_id, team_id=uuid.uuid4(), name="Renamed")
         repo.UpdateCategoryById.return_value = updated
 
-        result = UpdateCategoryByIdUseCase(repo).execute(category_id, UpdateCategoryDTO(name="Renamed"), uuid.uuid4())
+        result = UpdateCategoryByIdUseCase(repo).execute(
+            category_id, UpdateCategoryDTO(name="Renamed"), uuid.uuid4()
+        )
 
         assert result.name == "Renamed"
         repo.UpdateCategoryById.assert_called_once()
@@ -75,7 +84,9 @@ class TestUpdateCategoryByIdUseCase:
         repo.UpdateCategoryById.side_effect = Exception("not found")
 
         with pytest.raises(CategoryUpdateException):
-            UpdateCategoryByIdUseCase(repo).execute(uuid.uuid4(), UpdateCategoryDTO(name="X"), uuid.uuid4())
+            UpdateCategoryByIdUseCase(repo).execute(
+                uuid.uuid4(), UpdateCategoryDTO(name="X"), uuid.uuid4()
+            )
 
 
 class TestDeleteCategoryByIdUseCase:

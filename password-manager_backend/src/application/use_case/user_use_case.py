@@ -1,6 +1,11 @@
 import uuid
 
-from application.dto.user_dto import CreateUserDTO, UpdateUserDTO, UserDTO, UserPublicDTO
+from application.dto.user_dto import (
+    CreateUserDTO,
+    UpdateUserDTO,
+    UserDTO,
+    UserPublicDTO,
+)
 from application.exceptions.user_use_Case_exceptions import *
 
 from domain.interfaces.user_service_interface import IUserService
@@ -16,6 +21,7 @@ from domain.entities.user_teams_keys import UserTeamKey
 PERSONAL_TEAM_NAME = "Me"
 PERSONAL_TEAM_OWNER_PERM_LEVEL_NAME = "Owner"
 PERSONAL_TEAM_OWNER_PERM_LEVEL_RANK = 0
+
 
 class CreateUserUseCase:
     def __init__(

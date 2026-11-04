@@ -2,6 +2,7 @@ from datetime import datetime
 from pydantic import BaseModel, UUID4
 from typing import Optional
 
+
 class SubAccountHistoryDTO(BaseModel):
     id: UUID4
     sub_account_id: UUID4

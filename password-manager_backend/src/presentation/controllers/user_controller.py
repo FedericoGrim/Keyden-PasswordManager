@@ -5,7 +5,12 @@ from sqlalchemy.orm import Session
 
 from config import Container
 
-from application.dto.user_dto import CreateUserDTO, UpdateUserDTO, UserDTO, UserPublicDTO
+from application.dto.user_dto import (
+    CreateUserDTO,
+    UpdateUserDTO,
+    UserDTO,
+    UserPublicDTO,
+)
 
 from infrastructure.databases.database import get_db
 
@@ -33,13 +38,14 @@ async def create_user(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
 # -------------------- GET --------------------
 @router.get("/{keycloak_user_id}")
 async def get_user_by_keycloak_id(
     keycloak_user_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-) -> dict[str, str| UserDTO]:
+) -> dict[str, str | UserDTO]:
     container: Container = request.app.state.container
     get_user_use_case = container.user().GetUserByKeycloakIdProvider(
         UserRepository__db=db
@@ -49,6 +55,7 @@ async def get_user_by_keycloak_id(
         return {"message": "User retrieved successfully", "user": user}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
 
 # -------------------- LOOKUP --------------------
 @router.get("/lookup/{username}/{code}")
@@ -68,6 +75,7 @@ async def get_user_by_username_and_code(
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+
 @router.get("/id/{user_id}")
 async def get_user_by_id(
     user_id: uuid.UUID,
@@ -75,14 +83,13 @@ async def get_user_by_id(
     db: Session = Depends(get_db),
 ) -> dict[str, str | UserPublicDTO]:
     container: Container = request.app.state.container
-    get_user_use_case = container.user().GetUserByIdProvider(
-        UserRepository__db=db
-    )
+    get_user_use_case = container.user().GetUserByIdProvider(UserRepository__db=db)
     try:
         user = get_user_use_case.execute(user_id)
         return {"message": "User retrieved successfully", "user": user}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
 
 # -------------------- UPDATE --------------------
 @router.put("/{user_id}")
@@ -103,6 +110,7 @@ async def update_user_by_id(
         raise HTTPException(status_code=400, detail="User update failed")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 # -------------------- DELETE --------------------
 @router.delete("/{user_id}")

@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 from domain.entities.user_favorite import UserFavorite
 
+
 @abstractmethod
 class IUserFavoriteService(ABC):
     @abstractmethod
@@ -10,7 +11,9 @@ class IUserFavoriteService(ABC):
         pass
 
     @abstractmethod
-    def remove_favorite(self, user_id: uuid.UUID, sub_account_id: uuid.UUID) -> dict[str, str]:
+    def remove_favorite(
+        self, user_id: uuid.UUID, sub_account_id: uuid.UUID
+    ) -> dict[str, str]:
         pass
 
     @abstractmethod

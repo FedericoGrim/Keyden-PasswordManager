@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 from domain.entities.team_perm_level import TeamPermLevel
 
+
 @abstractmethod
 class ITeamPermLevelService(ABC):
     @abstractmethod
@@ -18,7 +19,9 @@ class ITeamPermLevelService(ABC):
         pass
 
     @abstractmethod
-    def UpdateTeamPermLevelById(self, perm_level_id: uuid.UUID, new_perm_level: TeamPermLevel) -> TeamPermLevel:
+    def UpdateTeamPermLevelById(
+        self, perm_level_id: uuid.UUID, new_perm_level: TeamPermLevel
+    ) -> TeamPermLevel:
         pass
 
     @abstractmethod

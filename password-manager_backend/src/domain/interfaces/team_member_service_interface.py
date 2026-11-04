@@ -3,12 +3,13 @@ from abc import ABC, abstractmethod
 
 from domain.entities.team_member import TeamMember
 
+
 @abstractmethod
 class ITeamMembersService(ABC):
     @abstractmethod
     def add_member_to_team(self, new_member: TeamMember) -> TeamMember:
         pass
-    
+
     @abstractmethod
     def get_team_member_by_id(self, member_id: uuid.UUID) -> TeamMember:
         pass
@@ -22,5 +23,7 @@ class ITeamMembersService(ABC):
         pass
 
     @abstractmethod
-    def remove_member_from_team(self, member_id: uuid.UUID, team_id: uuid.UUID) -> dict[str, str]:
+    def remove_member_from_team(
+        self, member_id: uuid.UUID, team_id: uuid.UUID
+    ) -> dict[str, str]:
         pass

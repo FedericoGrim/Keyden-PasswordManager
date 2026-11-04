@@ -8,11 +8,14 @@ from infrastructure.databases.team_postgreSQL import TeamService
 from infrastructure.databases.team_member_postgreSQL import TeamMembersService
 from infrastructure.databases.user_teams_keys_postgreSQL import UserTeamKeyService
 from infrastructure.databases.categories_postgresql import CategoriesService
-from infrastructure.databases.sub_account_categories_postgresql import SubAccountCategoriesService
+from infrastructure.databases.sub_account_categories_postgresql import (
+    SubAccountCategoriesService,
+)
 from infrastructure.databases.team_perm_levels_postgresql import TeamPermLevelsService
 from infrastructure.databases.user_favorites_postgreSQL import UserFavoritesService
-from infrastructure.databases.sub_account_history_postgreSQL import SubAccountHistoryService
-
+from infrastructure.databases.sub_account_history_postgreSQL import (
+    SubAccountHistoryService,
+)
 
 
 from application.use_case.user_use_case import (
@@ -51,7 +54,7 @@ from application.use_case.team_member_use_case import (
     GetTeamMemberByIdUseCase,
     GetTeamMembersByTeamIdUseCase,
     UpdateTeamMemberRoleUseCase,
-    RemoveMemberFromTeamUseCase
+    RemoveMemberFromTeamUseCase,
 )
 
 from application.use_case.user_teams_keys_use_case import (
@@ -60,7 +63,7 @@ from application.use_case.user_teams_keys_use_case import (
     GetUserTeamKeysByTeamIdUseCase,
     GetUserTeamKeysByUserIdUseCase,
     UpdateUserTeamKeyUseCase,
-    RemoveUserTeamKeyUseCase
+    RemoveUserTeamKeyUseCase,
 )
 
 from application.use_case.categories_use_case import (
@@ -95,9 +98,15 @@ from application.use_case.user_favorite_use_case import (
 class UserContainer(containers.DeclarativeContainer):
     UserRepositoryFactory = providers.Factory(UserService, db=providers.Dependency())
     TeamRepositoryFactory = providers.Factory(TeamService, db=providers.Dependency())
-    TeamPermLevelRepositoryFactory = providers.Factory(TeamPermLevelsService, db=providers.Dependency())
-    TeamMembersRepositoryFactory = providers.Factory(TeamMembersService, db=providers.Dependency())
-    UserTeamKeyRepositoryFactory = providers.Factory(UserTeamKeyService, db=providers.Dependency())
+    TeamPermLevelRepositoryFactory = providers.Factory(
+        TeamPermLevelsService, db=providers.Dependency()
+    )
+    TeamMembersRepositoryFactory = providers.Factory(
+        TeamMembersService, db=providers.Dependency()
+    )
+    UserTeamKeyRepositoryFactory = providers.Factory(
+        UserTeamKeyService, db=providers.Dependency()
+    )
 
     CreateUserProvider = providers.Factory(
         CreateUserUseCase,
@@ -130,8 +139,12 @@ class UserContainer(containers.DeclarativeContainer):
 
 
 class SubAccountContainer(containers.DeclarativeContainer):
-    SubAccountRepositoryFactory = providers.Factory(SubAccountService, db=providers.Dependency())
-    SubAccountHistoryRepositoryFactory = providers.Factory(SubAccountHistoryService, db=providers.Dependency())
+    SubAccountRepositoryFactory = providers.Factory(
+        SubAccountService, db=providers.Dependency()
+    )
+    SubAccountHistoryRepositoryFactory = providers.Factory(
+        SubAccountHistoryService, db=providers.Dependency()
+    )
 
     CreateSubAccountProvider = providers.Factory(
         CreateSubAccountUseCase,
@@ -160,8 +173,11 @@ class SubAccountContainer(containers.DeclarativeContainer):
         SubAccountHistoryRepository=SubAccountHistoryRepositoryFactory,
     )
 
+
 class SubAccountHistoryContainer(containers.DeclarativeContainer):
-    SubAccountHistoryRepositoryFactory = providers.Factory(SubAccountHistoryService, db=providers.Dependency())
+    SubAccountHistoryRepositoryFactory = providers.Factory(
+        SubAccountHistoryService, db=providers.Dependency()
+    )
 
     GetSubAccountHistoryBySubAccountIdProvider = providers.Factory(
         GetSubAccountHistoryBySubAccountIdUseCase,
@@ -197,19 +213,22 @@ class TeamContainer(containers.DeclarativeContainer):
         TeamRepository=TeamRepositoryFactory,
     )
 
+
 class TeamMembersContainer(containers.DeclarativeContainer):
-    TeamMembersRepositoryFactory = providers.Factory(TeamMembersService, db=providers.Dependency())
+    TeamMembersRepositoryFactory = providers.Factory(
+        TeamMembersService, db=providers.Dependency()
+    )
 
     AddMemberToTeamProvider = providers.Factory(
         AddMemberToTeamUseCase,
         TeamMembersRepository=TeamMembersRepositoryFactory,
     )
-    
+
     GetTeamMemberByIdProvider = providers.Factory(
         GetTeamMemberByIdUseCase,
         TeamMembersRepository=TeamMembersRepositoryFactory,
     )
-    
+
     GetTeamMembersByTeamIdProvider = providers.Factory(
         GetTeamMembersByTeamIdUseCase,
         TeamMembersRepository=TeamMembersRepositoryFactory,
@@ -224,8 +243,11 @@ class TeamMembersContainer(containers.DeclarativeContainer):
         TeamMembersRepository=TeamMembersRepositoryFactory,
     )
 
+
 class UserTeamKeyContainer(containers.DeclarativeContainer):
-    UserTeamKeyRepositoryFactory = providers.Factory(UserTeamKeyService, db=providers.Dependency())
+    UserTeamKeyRepositoryFactory = providers.Factory(
+        UserTeamKeyService, db=providers.Dependency()
+    )
 
     AddUserTeamKeyProvider = providers.Factory(
         AddUserTeamKeyUseCase,
@@ -256,8 +278,11 @@ class UserTeamKeyContainer(containers.DeclarativeContainer):
         UserTeamKeyRepository=UserTeamKeyRepositoryFactory,
     )
 
+
 class CategoriesContainer(containers.DeclarativeContainer):
-    CategoriesRepositoryFactory = providers.Factory(CategoriesService, db=providers.Dependency())
+    CategoriesRepositoryFactory = providers.Factory(
+        CategoriesService, db=providers.Dependency()
+    )
 
     CreateCategoriesProvider = providers.Factory(
         CreateCategoriesUseCase,
@@ -276,8 +301,11 @@ class CategoriesContainer(containers.DeclarativeContainer):
         CategoriesRepository=CategoriesRepositoryFactory,
     )
 
+
 class SubAccountCategoriesContainer(containers.DeclarativeContainer):
-    SubAccountCategoriesRepositoryFactory = providers.Factory(SubAccountCategoriesService, db=providers.Dependency())
+    SubAccountCategoriesRepositoryFactory = providers.Factory(
+        SubAccountCategoriesService, db=providers.Dependency()
+    )
 
     CreateSubAccountCategoryProvider = providers.Factory(
         CreateSubAccountCategoryUseCase,
@@ -293,8 +321,11 @@ class SubAccountCategoriesContainer(containers.DeclarativeContainer):
         SubAccountCategoriesRepository=SubAccountCategoriesRepositoryFactory,
     )
 
+
 class TeamPermLevelsContainer(containers.DeclarativeContainer):
-    TeamPermLevelRepositoryFactory = providers.Factory(TeamPermLevelsService, db=providers.Dependency())
+    TeamPermLevelRepositoryFactory = providers.Factory(
+        TeamPermLevelsService, db=providers.Dependency()
+    )
 
     CreateTeamPermLevelProvider = providers.Factory(
         CreateTeamPermLevelUseCase,
@@ -317,8 +348,11 @@ class TeamPermLevelsContainer(containers.DeclarativeContainer):
         TeamPermLevelRepository=TeamPermLevelRepositoryFactory,
     )
 
+
 class UserFavoritesContainer(containers.DeclarativeContainer):
-    UserFavoriteRepositoryFactory = providers.Factory(UserFavoritesService, db=providers.Dependency())
+    UserFavoriteRepositoryFactory = providers.Factory(
+        UserFavoritesService, db=providers.Dependency()
+    )
 
     AddFavoriteProvider = providers.Factory(
         AddFavoriteUseCase,
@@ -333,6 +367,7 @@ class UserFavoritesContainer(containers.DeclarativeContainer):
         UserFavoriteRepository=UserFavoriteRepositoryFactory,
     )
 
+
 # ------------------- Aggregated Container -------------------
 class Container(containers.DeclarativeContainer):
     user = providers.Container(UserContainer)
@@ -345,4 +380,3 @@ class Container(containers.DeclarativeContainer):
     team_perm_levels = providers.Container(TeamPermLevelsContainer)
     user_favorites = providers.Container(UserFavoritesContainer)
     sub_account_history = providers.Container(SubAccountHistoryContainer)
-

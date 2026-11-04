@@ -57,7 +57,9 @@ class UserTeamKeyService(IUserTeamKeyService):
 
     def get_keys_by_team_id(self, team_id: uuid.UUID) -> list[UserTeamKey]:
         try:
-            key_models = self.Db.query(UserTeamKeyModel).filter_by(team_id=team_id).all()
+            key_models = (
+                self.Db.query(UserTeamKeyModel).filter_by(team_id=team_id).all()
+            )
             return [_to_domain(key_model) for key_model in key_models]
 
         except Exception as e:
@@ -66,7 +68,9 @@ class UserTeamKeyService(IUserTeamKeyService):
 
     def get_keys_by_user_id(self, user_id: uuid.UUID) -> list[UserTeamKey]:
         try:
-            key_models = self.Db.query(UserTeamKeyModel).filter_by(user_id=user_id).all()
+            key_models = (
+                self.Db.query(UserTeamKeyModel).filter_by(user_id=user_id).all()
+            )
             return [_to_domain(key_model) for key_model in key_models]
 
         except Exception as e:
@@ -75,10 +79,11 @@ class UserTeamKeyService(IUserTeamKeyService):
 
     def update_key(self, new_key_data: UserTeamKey) -> UserTeamKey:
         try:
-            key_model = self.Db.query(UserTeamKeyModel).filter_by(
-                user_id=new_key_data.user_id,
-                team_id=new_key_data.team_id
-            ).first()
+            key_model = (
+                self.Db.query(UserTeamKeyModel)
+                .filter_by(user_id=new_key_data.user_id, team_id=new_key_data.team_id)
+                .first()
+            )
 
             if not key_model:
                 raise Exception("Key not found for this user in this team.")
@@ -95,10 +100,11 @@ class UserTeamKeyService(IUserTeamKeyService):
 
     def remove_key(self, user_id: uuid.UUID, team_id: uuid.UUID) -> dict[str, str]:
         try:
-            key_model = self.Db.query(UserTeamKeyModel).filter_by(
-                user_id=user_id,
-                team_id=team_id
-            ).first()
+            key_model = (
+                self.Db.query(UserTeamKeyModel)
+                .filter_by(user_id=user_id, team_id=team_id)
+                .first()
+            )
 
             if not key_model:
                 raise Exception("Key not found for this user in this team.")

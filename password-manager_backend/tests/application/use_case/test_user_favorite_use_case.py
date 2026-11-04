@@ -25,10 +25,14 @@ def repo():
 
 class TestAddFavoriteUseCase:
     def test_returns_dto_from_repository_result(self, repo):
-        favorite = UserFavorite(id=uuid.uuid4(), user_id=uuid.uuid4(), sub_account_id=uuid.uuid4())
+        favorite = UserFavorite(
+            id=uuid.uuid4(), user_id=uuid.uuid4(), sub_account_id=uuid.uuid4()
+        )
         repo.add_favorite.return_value = favorite
 
-        dto = CreateFavoriteDTO(user_id=favorite.user_id, sub_account_id=favorite.sub_account_id)
+        dto = CreateFavoriteDTO(
+            user_id=favorite.user_id, sub_account_id=favorite.sub_account_id
+        )
         result = AddFavoriteUseCase(repo).execute(dto)
 
         assert result.id == favorite.id
@@ -65,7 +69,9 @@ class TestGetFavoritesByUserIdUseCase:
 
 class TestRemoveFavoriteUseCase:
     def test_returns_repository_result(self, repo):
-        repo.remove_favorite.return_value = {"message": "Favorite removed successfully."}
+        repo.remove_favorite.return_value = {
+            "message": "Favorite removed successfully."
+        }
         user_id, sub_account_id = uuid.uuid4(), uuid.uuid4()
 
         result = RemoveFavoriteUseCase(repo).execute(user_id, sub_account_id)

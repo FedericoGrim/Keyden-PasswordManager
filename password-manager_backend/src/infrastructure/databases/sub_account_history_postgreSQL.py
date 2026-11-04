@@ -4,9 +4,13 @@ import logging
 
 from infrastructure.exceptions.sub_account_history_postgreSQL_exceptions import *
 
-from domain.interfaces.sub_account_history_service_interface import ISubAccountHistoryService
+from domain.interfaces.sub_account_history_service_interface import (
+    ISubAccountHistoryService,
+)
 from domain.entities.sub_account_history import SubAccountHistory
-from infrastructure.databases.models.sub_account_history_model import SubAccountHistoryModel
+from infrastructure.databases.models.sub_account_history_model import (
+    SubAccountHistoryModel,
+)
 from infrastructure.databases.models.sub_account_model import SubAccountModel
 
 
@@ -46,9 +50,13 @@ class SubAccountHistoryService(ISubAccountHistoryService):
 
         except Exception as e:
             logging.error(f"Error: {e}")
-            raise SubAccountHistoryCreationFailedException("Failed to create sub_account history entry.")
+            raise SubAccountHistoryCreationFailedException(
+                "Failed to create sub_account history entry."
+            )
 
-    def GetHistoryBySubAccountId(self, sub_account_id: uuid.UUID) -> list[SubAccountHistory]:
+    def GetHistoryBySubAccountId(
+        self, sub_account_id: uuid.UUID
+    ) -> list[SubAccountHistory]:
         try:
             history_models = (
                 self.db.query(SubAccountHistoryModel)
@@ -60,13 +68,18 @@ class SubAccountHistoryService(ISubAccountHistoryService):
 
         except Exception as e:
             logging.error(f"Error: {e}")
-            raise SubAccountHistoryRetrievalException("Failed to retrieve sub_account history.")
+            raise SubAccountHistoryRetrievalException(
+                "Failed to retrieve sub_account history."
+            )
 
     def GetHistoryByTeamId(self, team_id: uuid.UUID) -> list[SubAccountHistory]:
         try:
             history_models = (
                 self.db.query(SubAccountHistoryModel)
-                .join(SubAccountModel, SubAccountModel.id == SubAccountHistoryModel.sub_account_id)
+                .join(
+                    SubAccountModel,
+                    SubAccountModel.id == SubAccountHistoryModel.sub_account_id,
+                )
                 .filter(SubAccountModel.team_id == team_id)
                 .all()
             )
@@ -74,13 +87,23 @@ class SubAccountHistoryService(ISubAccountHistoryService):
 
         except Exception as e:
             logging.error(f"Error: {e}")
-            raise SubAccountHistoryRetrievalException("Failed to retrieve sub_account history for team.")
+            raise SubAccountHistoryRetrievalException(
+                "Failed to retrieve sub_account history for team."
+            )
 
-    def UpdateHistoryDek(self, history_id: uuid.UUID, dek_wrapped: str) -> SubAccountHistory:
+    def UpdateHistoryDek(
+        self, history_id: uuid.UUID, dek_wrapped: str
+    ) -> SubAccountHistory:
         try:
-            history_model = self.db.query(SubAccountHistoryModel).filter(SubAccountHistoryModel.id == history_id).first()
+            history_model = (
+                self.db.query(SubAccountHistoryModel)
+                .filter(SubAccountHistoryModel.id == history_id)
+                .first()
+            )
             if not history_model:
-                raise SubAccountHistoryNotFoundException("SubAccount history entry not found.")
+                raise SubAccountHistoryNotFoundException(
+                    "SubAccount history entry not found."
+                )
 
             history_model.dek_wrapped = dek_wrapped
             self.db.flush()
@@ -92,4 +115,6 @@ class SubAccountHistoryService(ISubAccountHistoryService):
 
         except Exception as e:
             logging.error(f"Error: {e}")
-            raise SubAccountHistoryDekUpdateException("Failed to update sub_account history data key.")
+            raise SubAccountHistoryDekUpdateException(
+                "Failed to update sub_account history data key."
+            )

@@ -43,7 +43,10 @@ def _signing_key(kid: str) -> dict[str, Any]:
 
     # Unknown kid usually means the IdP rotated its keys: refetch, but rate-limited so
     # tokens with random kids can't turn this service into a request amplifier.
-    if kid not in _jwks_keys and time.monotonic() - _jwks_fetched_at > JWKS_MIN_REFRESH_SECONDS:
+    if (
+        kid not in _jwks_keys
+        and time.monotonic() - _jwks_fetched_at > JWKS_MIN_REFRESH_SECONDS
+    ):
         jwks = _http_get_json(_discovery_document()["jwks_uri"])
         _jwks_keys = {key["kid"]: key for key in jwks.get("keys", []) if "kid" in key}
         _jwks_fetched_at = time.monotonic()

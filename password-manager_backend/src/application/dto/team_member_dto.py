@@ -46,4 +46,3 @@ class UpdateTeamMemberDTO(BaseModel):
 class RemoveTeamMemberDTO(BaseModel):
     member_id: UUID
     team_id: UUID
-

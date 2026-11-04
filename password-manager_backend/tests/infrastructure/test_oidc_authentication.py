@@ -17,21 +17,35 @@ JWKS_URI = f"{ISSUER}/certs"
 
 
 def _rsa_key(kid: str) -> tuple[str, dict]:
-    private_pem = rsa.generate_private_key(public_exponent=65537, key_size=2048).private_bytes(
-        serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()
-    ).decode()
+    private_pem = (
+        rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        .private_bytes(
+            serialization.Encoding.PEM,
+            serialization.PrivateFormat.PKCS8,
+            serialization.NoEncryption(),
+        )
+        .decode()
+    )
     public_jwk = jwk.construct(private_pem, "RS256").public_key().to_dict()
     public_jwk["kid"] = kid
     return private_pem, public_jwk
 
 
 def _token(private_pem: str, kid: str, **claims) -> str:
-    payload = {"sub": "user-1", "iss": ISSUER, "aud": AUDIENCE, "exp": int(time.time()) + 60, **claims}
+    payload = {
+        "sub": "user-1",
+        "iss": ISSUER,
+        "aud": AUDIENCE,
+        "exp": int(time.time()) + 60,
+        **claims,
+    }
     return jwt.encode(payload, private_pem, algorithm="RS256", headers={"kid": kid})
 
 
 def _authenticate(token: str) -> dict:
-    return oidc.jwt_authentication(HTTPAuthorizationCredentials(scheme="Bearer", credentials=token))
+    return oidc.jwt_authentication(
+        HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
+    )
 
 
 @pytest.fixture
@@ -43,7 +57,11 @@ def idp(monkeypatch):
         state.calls.append(url)
         if state.down:
             raise requests.ConnectionError("down")
-        body = {"jwks_uri": JWKS_URI} if url.endswith("/.well-known/openid-configuration") else state.jwks
+        body = (
+            {"jwks_uri": JWKS_URI}
+            if url.endswith("/.well-known/openid-configuration")
+            else state.jwks
+        )
         return MagicMock(json=lambda: body, raise_for_status=lambda: None)
 
     monkeypatch.setenv("OIDC_ISSUER", ISSUER)
@@ -91,7 +109,9 @@ def test_unknown_kid_refetch_is_rate_limited(idp):
     assert idp.calls.count(JWKS_URI) == 1
 
 
-@pytest.mark.parametrize("claims", [{"iss": "https://evil.example.com"}, {"aud": "other"}, {"exp": 1}])
+@pytest.mark.parametrize(
+    "claims", [{"iss": "https://evil.example.com"}, {"aud": "other"}, {"exp": 1}]
+)
 def test_rejects_wrong_issuer_audience_or_expired(idp, claims):
     private_pem, public_jwk = _rsa_key("k1")
     idp.jwks = {"keys": [public_jwk]}
@@ -105,7 +125,12 @@ def test_rejects_symmetric_token_signed_with_public_key(idp):
     _, public_jwk = _rsa_key("k1")
     idp.jwks = {"keys": [public_jwk]}
     forged = jwt.encode(
-        {"sub": "attacker", "iss": ISSUER, "aud": AUDIENCE, "exp": int(time.time()) + 60},
+        {
+            "sub": "attacker",
+            "iss": ISSUER,
+            "aud": AUDIENCE,
+            "exp": int(time.time()) + 60,
+        },
         "any-secret",
         algorithm="HS256",
         headers={"kid": "k1"},

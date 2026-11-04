@@ -89,4 +89,3 @@ class DekUpdateItem(BaseModel):
 class RotateSubAccountDeksDTO(BaseModel):
     sub_accounts: list[DekUpdateItem] = []
     history: list[DekUpdateItem] = []
-

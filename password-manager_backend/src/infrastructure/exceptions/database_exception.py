@@ -8,9 +8,11 @@ class PostgreSqlConnectionException(Exception):
     Args:
         message (str): Explanation of the error. Defaults to "PostgreSQL connection error occurred
     """
-    def __init__(self, message: str="PostgreSQL connection error occurred"):
+
+    def __init__(self, message: str = "PostgreSQL connection error occurred"):
         self.message = message
         super().__init__(self.message)
+
 
 class PostgreSqlException(Exception):
     """
@@ -22,6 +24,7 @@ class PostgreSqlException(Exception):
     Args:
         message (str): Explanation of the error. Defaults to "PostgreSQL error occurred".
     """
-    def __init__(self, message: str="PostgreSQL error occurred"):
+
+    def __init__(self, message: str = "PostgreSQL error occurred"):
         self.message = message
         super().__init__(self.message)

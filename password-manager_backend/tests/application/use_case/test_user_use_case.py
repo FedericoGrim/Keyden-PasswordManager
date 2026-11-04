@@ -61,7 +61,12 @@ class TestCreateUserUseCase:
     async def test_provisions_personal_team_and_owner_membership(self, repos):
         user = make_user()
         team = Team(id=uuid.uuid4(), name=PERSONAL_TEAM_NAME, is_personal=True)
-        perm_level = TeamPermLevel(id=uuid.uuid4(), team_id=team.id, name=PERSONAL_TEAM_OWNER_PERM_LEVEL_NAME, rank=PERSONAL_TEAM_OWNER_PERM_LEVEL_RANK)
+        perm_level = TeamPermLevel(
+            id=uuid.uuid4(),
+            team_id=team.id,
+            name=PERSONAL_TEAM_OWNER_PERM_LEVEL_NAME,
+            rank=PERSONAL_TEAM_OWNER_PERM_LEVEL_RANK,
+        )
 
         repos["user"].create_user.return_value = user
         repos["team"].CreateTeam.return_value = team
@@ -75,9 +80,16 @@ class TestCreateUserUseCase:
             UserTeamKeyRepository=repos["user_teams_keys"],
         )
         dto = CreateUserDTO(
-            id=user.id, keycloak_id=user.keycloak_id, username="alice", code="ABC1234567",
-            salt="salt", public_key_ec=b"pub_ec", private_key_ec=b"priv_ec",
-            public_key_pq=b"pub_pq", private_key_pq=b"priv_pq", team_key_encrypted="enc-team-key",
+            id=user.id,
+            keycloak_id=user.keycloak_id,
+            username="alice",
+            code="ABC1234567",
+            salt="salt",
+            public_key_ec=b"pub_ec",
+            private_key_ec=b"priv_ec",
+            public_key_pq=b"pub_pq",
+            private_key_pq=b"priv_pq",
+            team_key_encrypted="enc-team-key",
         )
 
         result = await use_case.execute(dto)
@@ -89,7 +101,9 @@ class TestCreateUserUseCase:
         assert created_team.is_personal is True
 
         # ...with an Owner permission level scoped to that team...
-        created_perm_level = repos["team_perm_level"].CreateTeamPermLevel.call_args.args[0]
+        created_perm_level = repos[
+            "team_perm_level"
+        ].CreateTeamPermLevel.call_args.args[0]
         assert created_perm_level.team_id == team.id
         assert created_perm_level.rank == PERSONAL_TEAM_OWNER_PERM_LEVEL_RANK
 
@@ -117,9 +131,16 @@ class TestCreateUserUseCase:
             UserTeamKeyRepository=repos["user_teams_keys"],
         )
         dto = CreateUserDTO(
-            id=uuid.uuid4(), keycloak_id=uuid.uuid4(), username="alice", code="ABC1234567",
-            salt="salt", public_key_ec=b"a", private_key_ec=b"b",
-            public_key_pq=b"c", private_key_pq=b"d", team_key_encrypted="enc-team-key",
+            id=uuid.uuid4(),
+            keycloak_id=uuid.uuid4(),
+            username="alice",
+            code="ABC1234567",
+            salt="salt",
+            public_key_ec=b"a",
+            private_key_ec=b"b",
+            public_key_pq=b"c",
+            private_key_pq=b"d",
+            team_key_encrypted="enc-team-key",
         )
 
         with pytest.raises(UserCreationException):
@@ -148,7 +169,9 @@ class TestGetUserByUsernameAndCodeUseCase:
         user = make_user()
         repos["user"].get_user_by_username_and_code.return_value = user
 
-        result = GetUserByUsernameAndCodeUseCase(repos["user"]).execute("alice", "ABC1234567")
+        result = GetUserByUsernameAndCodeUseCase(repos["user"]).execute(
+            "alice", "ABC1234567"
+        )
 
         assert result.username == "alice"
         assert not hasattr(result, "private_key_ec")
@@ -157,7 +180,9 @@ class TestGetUserByUsernameAndCodeUseCase:
         repos["user"].get_user_by_username_and_code.side_effect = Exception("not found")
 
         with pytest.raises(UserRetrievalException):
-            GetUserByUsernameAndCodeUseCase(repos["user"]).execute("alice", "ABC1234567")
+            GetUserByUsernameAndCodeUseCase(repos["user"]).execute(
+                "alice", "ABC1234567"
+            )
 
 
 class TestGetUserByIdUseCase:
@@ -179,24 +204,38 @@ class TestGetUserByIdUseCase:
 class TestUpdateUserByIdUseCase:
     async def test_merges_into_existing_and_returns_dto(self, repos):
         existing = make_user(username="alice")
-        updated = make_user(id=existing.id, keycloak_id=existing.keycloak_id, username="alice2")
+        updated = make_user(
+            id=existing.id, keycloak_id=existing.keycloak_id, username="alice2"
+        )
         repos["user"].get_user_by_keycloak_id.return_value = existing
         repos["user"].update_user_by_id.return_value = updated
 
         dto = UpdateUserDTO(
-            keycloak_id=None, username="alice2", salt=None,
-            public_key_ec=None, private_key_ec=None, public_key_pq=None, private_key_pq=None,
+            keycloak_id=None,
+            username="alice2",
+            salt=None,
+            public_key_ec=None,
+            private_key_ec=None,
+            public_key_pq=None,
+            private_key_pq=None,
         )
 
-        result = await UpdateUserByIdUseCase(repos["user"]).execute(existing.keycloak_id, dto)
+        result = await UpdateUserByIdUseCase(repos["user"]).execute(
+            existing.keycloak_id, dto
+        )
 
         assert result.username == "alice2"
 
     async def test_wraps_repository_errors(self, repos):
         repos["user"].get_user_by_keycloak_id.side_effect = Exception("not found")
         dto = UpdateUserDTO(
-            keycloak_id=None, username=None, salt=None,
-            public_key_ec=None, private_key_ec=None, public_key_pq=None, private_key_pq=None,
+            keycloak_id=None,
+            username=None,
+            salt=None,
+            public_key_ec=None,
+            private_key_ec=None,
+            public_key_pq=None,
+            private_key_pq=None,
         )
 
         with pytest.raises(UserUpdateException):
@@ -205,7 +244,9 @@ class TestUpdateUserByIdUseCase:
 
 class TestDeleteUserByIdUseCase:
     async def test_returns_repository_result(self, repos):
-        repos["user"].delete_user_by_id.return_value = {"message": "User deleted successfully."}
+        repos["user"].delete_user_by_id.return_value = {
+            "message": "User deleted successfully."
+        }
 
         result = await DeleteUserByIdUseCase(repos["user"]).execute(uuid.uuid4())
 

@@ -42,12 +42,15 @@ class UserFavoritesService(IUserFavoriteService):
             logging.error(f"Error: {e}")
             raise Exception("Failed to add favorite.")
 
-    def remove_favorite(self, user_id: uuid.UUID, sub_account_id: uuid.UUID) -> dict[str, str]:
+    def remove_favorite(
+        self, user_id: uuid.UUID, sub_account_id: uuid.UUID
+    ) -> dict[str, str]:
         try:
-            favorite_model = self.Db.query(UserFavoriteModel).filter_by(
-                user_id=user_id,
-                sub_account_id=sub_account_id
-            ).first()
+            favorite_model = (
+                self.Db.query(UserFavoriteModel)
+                .filter_by(user_id=user_id, sub_account_id=sub_account_id)
+                .first()
+            )
 
             if not favorite_model:
                 raise Exception("Favorite not found.")
@@ -63,7 +66,9 @@ class UserFavoritesService(IUserFavoriteService):
 
     def get_favorites_by_user_id(self, user_id: uuid.UUID) -> list[UserFavorite]:
         try:
-            favorite_models = self.Db.query(UserFavoriteModel).filter_by(user_id=user_id).all()
+            favorite_models = (
+                self.Db.query(UserFavoriteModel).filter_by(user_id=user_id).all()
+            )
             return [_to_domain(favorite_model) for favorite_model in favorite_models]
 
         except Exception as e:

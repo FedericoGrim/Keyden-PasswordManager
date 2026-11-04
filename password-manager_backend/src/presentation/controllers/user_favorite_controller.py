@@ -10,6 +10,7 @@ from infrastructure.databases.database import get_db
 
 router = APIRouter()
 
+
 # -------------------- CREATE --------------------
 @router.post("/")
 async def add_favorite(
@@ -27,6 +28,7 @@ async def add_favorite(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
 # -------------------- GET --------------------
 @router.get("/user/{user_id}")
 async def get_favorites_by_user_id(
@@ -43,6 +45,7 @@ async def get_favorites_by_user_id(
         return {"message": "Favorites retrieved successfully", "favorites": favorites}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
 
 # -------------------- DELETE --------------------
 @router.delete("/{user_id}/{sub_account_id}")

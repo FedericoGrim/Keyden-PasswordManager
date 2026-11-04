@@ -35,4 +35,3 @@ class UpdateTeamDTO(BaseModel):
 
 class DeleteTeamDTO(BaseModel):
     id: UUID
-

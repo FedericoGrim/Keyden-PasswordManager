@@ -30,13 +30,13 @@ class SubAccountService(ISubAccountService):
     def CreateSubAccount(self, sub_account: SubAccount) -> SubAccount:
         try:
             subaccount_model = SubAccountModel(
-                team_id = sub_account.team_id,
-                username_encrypted = sub_account.username_encrypted,
-                password_encrypted = sub_account.password_encrypted,
-                email_encrypted = sub_account.email_encrypted,
-                site_link_encrypted = sub_account.site_link_encrypted,
-                required_perm_level_id = sub_account.required_perm_level_id,
-                dek_wrapped = sub_account.dek_wrapped
+                team_id=sub_account.team_id,
+                username_encrypted=sub_account.username_encrypted,
+                password_encrypted=sub_account.password_encrypted,
+                email_encrypted=sub_account.email_encrypted,
+                site_link_encrypted=sub_account.site_link_encrypted,
+                required_perm_level_id=sub_account.required_perm_level_id,
+                dek_wrapped=sub_account.dek_wrapped,
             )
 
             self.db.add(subaccount_model)
@@ -45,7 +45,9 @@ class SubAccountService(ISubAccountService):
             return _to_domain(subaccount_model)
 
         except IntegrityError:
-            raise SubAccountAlreadyExistsException("SubAccount with the same name already exists.")
+            raise SubAccountAlreadyExistsException(
+                "SubAccount with the same name already exists."
+            )
 
         except Exception as e:
             logging.error(f"Error: {e}")
@@ -53,7 +55,11 @@ class SubAccountService(ISubAccountService):
 
     def GetSubAccountById(self, sub_account_id: uuid.UUID) -> SubAccount:
         try:
-            subaccount_model = self.db.query(SubAccountModel).filter(SubAccountModel.id == sub_account_id).first()
+            subaccount_model = (
+                self.db.query(SubAccountModel)
+                .filter(SubAccountModel.id == sub_account_id)
+                .first()
+            )
             if not subaccount_model:
                 raise SubAccountNotFoundException("SubAccount not found.")
             return _to_domain(subaccount_model)
@@ -64,7 +70,11 @@ class SubAccountService(ISubAccountService):
 
     def GetAllSubAccountsByTeamId(self, team_id: uuid.UUID) -> list[SubAccount]:
         try:
-            subaccount_models = self.db.query(SubAccountModel).filter(SubAccountModel.team_id == team_id).all()
+            subaccount_models = (
+                self.db.query(SubAccountModel)
+                .filter(SubAccountModel.team_id == team_id)
+                .all()
+            )
             return [_to_domain(model) for model in subaccount_models]
 
         except Exception as e:
@@ -73,7 +83,11 @@ class SubAccountService(ISubAccountService):
 
     def UpdateSubAccountById(self, new_subaccount: SubAccount) -> SubAccount:
         try:
-            subaccount_model = self.db.query(SubAccountModel).filter(SubAccountModel.id == new_subaccount.id).first()
+            subaccount_model = (
+                self.db.query(SubAccountModel)
+                .filter(SubAccountModel.id == new_subaccount.id)
+                .first()
+            )
             if not subaccount_model:
                 raise SubAccountNotFoundException("SubAccount not found.")
 
@@ -81,7 +95,9 @@ class SubAccountService(ISubAccountService):
             subaccount_model.email_encrypted = new_subaccount.email_encrypted
             subaccount_model.password_encrypted = new_subaccount.password_encrypted
             subaccount_model.site_link_encrypted = new_subaccount.site_link_encrypted
-            subaccount_model.required_perm_level_id = new_subaccount.required_perm_level_id
+            subaccount_model.required_perm_level_id = (
+                new_subaccount.required_perm_level_id
+            )
             self.db.flush()
             self.db.refresh(subaccount_model)
             return _to_domain(subaccount_model)
@@ -92,7 +108,11 @@ class SubAccountService(ISubAccountService):
 
     def DeleteSubAccountById(self, sub_account_id: uuid.UUID) -> dict[str, str]:
         try:
-            subaccount_model = self.db.query(SubAccountModel).filter(SubAccountModel.id == sub_account_id).first()
+            subaccount_model = (
+                self.db.query(SubAccountModel)
+                .filter(SubAccountModel.id == sub_account_id)
+                .first()
+            )
             if not subaccount_model:
                 raise SubAccountNotFoundException("SubAccount not found.")
 
@@ -103,9 +123,15 @@ class SubAccountService(ISubAccountService):
             logging.error(f"Error: {e}")
             raise SubAccountDeletionException("Failed to delete sub_account.")
 
-    def UpdateSubAccountDek(self, sub_account_id: uuid.UUID, dek_wrapped: str) -> SubAccount:
+    def UpdateSubAccountDek(
+        self, sub_account_id: uuid.UUID, dek_wrapped: str
+    ) -> SubAccount:
         try:
-            subaccount_model = self.db.query(SubAccountModel).filter(SubAccountModel.id == sub_account_id).first()
+            subaccount_model = (
+                self.db.query(SubAccountModel)
+                .filter(SubAccountModel.id == sub_account_id)
+                .first()
+            )
             if not subaccount_model:
                 raise SubAccountNotFoundException("SubAccount not found.")
 

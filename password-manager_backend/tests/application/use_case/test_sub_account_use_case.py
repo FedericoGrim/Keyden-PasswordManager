@@ -3,7 +3,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from application.dto.sub_account_dto import CreateSubAccountDTO, UpdateSubAccountDTO, DeleteSubAccountDTO
+from application.dto.sub_account_dto import (
+    CreateSubAccountDTO,
+    UpdateSubAccountDTO,
+    DeleteSubAccountDTO,
+)
 from application.exceptions.sub_account_use_case_exceptions import (
     CreateSubAccountException,
     SubAccountRetrievalException,
@@ -19,7 +23,9 @@ from application.use_case.sub_account_use_case import (
 )
 from domain.entities.sub_account import SubAccount
 from domain.interfaces.sub_account_service_interface import ISubAccountService
-from domain.interfaces.sub_account_history_service_interface import ISubAccountHistoryService
+from domain.interfaces.sub_account_history_service_interface import (
+    ISubAccountHistoryService,
+)
 
 
 @pytest.fixture
@@ -108,7 +114,10 @@ class TestGetSubAccountByIdUseCase:
 class TestGetAllSubAccountsByTeamIdUseCase:
     def test_maps_entities_to_dtos(self, repo: MagicMock):
         team_id = uuid.uuid4()
-        entities = [make_sub_account(team_id=team_id), make_sub_account(team_id=team_id)]
+        entities = [
+            make_sub_account(team_id=team_id),
+            make_sub_account(team_id=team_id),
+        ]
         repo.GetAllSubAccountsByTeamId.return_value = entities
 
         result = GetAllSubAccountsByTeamIdUseCase(repo).execute(team_id)
@@ -125,9 +134,13 @@ class TestGetAllSubAccountsByTeamIdUseCase:
 
 
 class TestUpdateSubAccountByIdUseCase:
-    def test_merges_into_existing_and_returns_dto(self, repo: MagicMock, history_repo: MagicMock):
+    def test_merges_into_existing_and_returns_dto(
+        self, repo: MagicMock, history_repo: MagicMock
+    ):
         existing = make_sub_account(username_encrypted="old-user")
-        updated = make_sub_account(id=existing.id, team_id=existing.team_id, username_encrypted="new-user")
+        updated = make_sub_account(
+            id=existing.id, team_id=existing.team_id, username_encrypted="new-user"
+        )
         repo.GetSubAccountById.return_value = existing
         repo.UpdateSubAccountById.return_value = updated
 
@@ -140,7 +153,9 @@ class TestUpdateSubAccountByIdUseCase:
             required_perm_level_id=None,
         )
 
-        result = UpdateSubAccountByIdUseCase(repo, history_repo).execute(uuid.uuid4(), dto)
+        result = UpdateSubAccountByIdUseCase(repo, history_repo).execute(
+            uuid.uuid4(), dto
+        )
 
         assert result.id == existing.id
         assert result.username_encrypted == "new-user"
@@ -164,10 +179,14 @@ class TestUpdateSubAccountByIdUseCase:
 
 class TestDeleteSubAccountByIdUseCase:
     def test_returns_repository_result(self, repo: MagicMock):
-        repo.DeleteSubAccountById.return_value = {"message": "SubAccount deleted successfully."}
+        repo.DeleteSubAccountById.return_value = {
+            "message": "SubAccount deleted successfully."
+        }
         sub_account_id = uuid.uuid4()
 
-        result = DeleteSubAccountByIdUseCase(repo).execute(uuid.uuid4(), DeleteSubAccountDTO(id=sub_account_id))
+        result = DeleteSubAccountByIdUseCase(repo).execute(
+            uuid.uuid4(), DeleteSubAccountDTO(id=sub_account_id)
+        )
 
         assert result == {"message": "SubAccount deleted successfully."}
         repo.DeleteSubAccountById.assert_called_once_with(sub_account_id)
@@ -176,4 +195,6 @@ class TestDeleteSubAccountByIdUseCase:
         repo.DeleteSubAccountById.side_effect = Exception("cannot delete")
 
         with pytest.raises(SubAccountDeletionException):
-            DeleteSubAccountByIdUseCase(repo).execute(uuid.uuid4(), DeleteSubAccountDTO(id=uuid.uuid4()))
+            DeleteSubAccountByIdUseCase(repo).execute(
+                uuid.uuid4(), DeleteSubAccountDTO(id=uuid.uuid4())
+            )

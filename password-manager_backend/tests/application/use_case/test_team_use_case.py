@@ -32,7 +32,9 @@ class TestCreateTeamUseCase:
         created = Team(id=uuid.uuid4(), name="Engineering", is_personal=False)
         repo.CreateTeam.return_value = created
 
-        result = CreateTeamUseCase(repo).execute(uuid.uuid4(), CreateTeamDTO(name="Engineering"))
+        result = CreateTeamUseCase(repo).execute(
+            uuid.uuid4(), CreateTeamDTO(name="Engineering")
+        )
 
         assert result is created
         passed_entity = repo.CreateTeam.call_args.args[0]
@@ -43,7 +45,9 @@ class TestCreateTeamUseCase:
         repo.CreateTeam.side_effect = Exception("duplicate")
 
         with pytest.raises(TeamCreationException):
-            CreateTeamUseCase(repo).execute(uuid.uuid4(), CreateTeamDTO(name="Engineering"))
+            CreateTeamUseCase(repo).execute(
+                uuid.uuid4(), CreateTeamDTO(name="Engineering")
+            )
 
 
 class TestGetTeamByIdUseCase:
@@ -66,7 +70,10 @@ class TestGetTeamByIdUseCase:
 
 class TestGetTeamsByUserIdUseCase:
     def test_maps_entities_to_dtos(self, repo):
-        teams = [Team(id=uuid.uuid4(), name="Me", is_personal=True), Team(id=uuid.uuid4(), name="Work", is_personal=False)]
+        teams = [
+            Team(id=uuid.uuid4(), name="Me", is_personal=True),
+            Team(id=uuid.uuid4(), name="Work", is_personal=False),
+        ]
         repo.GetTeamsByUserId.return_value = teams
 
         result = GetTeamsByUserIdUseCase(repo).execute(uuid.uuid4())
@@ -99,7 +106,9 @@ class TestUpdateTeamByIdUseCase:
         repo.GetTeamById.side_effect = Exception("missing")
 
         with pytest.raises(TeamUpdateException):
-            UpdateTeamByIdUseCase(repo).execute(uuid.uuid4(), UpdateTeamDTO(id=uuid.uuid4(), name="X"))
+            UpdateTeamByIdUseCase(repo).execute(
+                uuid.uuid4(), UpdateTeamDTO(id=uuid.uuid4(), name="X")
+            )
 
 
 class TestDeleteTeamByIdUseCase:
@@ -114,4 +123,6 @@ class TestDeleteTeamByIdUseCase:
         repo.DeleteTeamById.side_effect = Exception("cannot delete")
 
         with pytest.raises(TeamDeleteException):
-            DeleteTeamByIdUseCase(repo).execute(uuid.uuid4(), DeleteTeamDTO(id=uuid.uuid4()))
+            DeleteTeamByIdUseCase(repo).execute(
+                uuid.uuid4(), DeleteTeamDTO(id=uuid.uuid4())
+            )

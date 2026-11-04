@@ -4,15 +4,20 @@ from sqlalchemy.orm import Session
 
 from config import Container
 
-from application.dto.team_dto import TeamDTO, CreateTeamDTO, UpdateTeamDTO, DeleteTeamDTO
+from application.dto.team_dto import (
+    TeamDTO,
+    CreateTeamDTO,
+    UpdateTeamDTO,
+    DeleteTeamDTO,
+)
 
 from infrastructure.databases.database import get_db
 
 router = APIRouter()
 
+
 # -------------------- CREATE --------------------
 @router.post("/")
-
 async def ApiCreateTeam(
     user_interactor_id: uuid.UUID,
     team: CreateTeamDTO,
@@ -29,28 +34,26 @@ async def ApiCreateTeam(
         return {"message": "Team created successfully", "team_id": str(new_team.id)}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
+
+
 # -------------------- GET --------------------
 @router.get("/{team_id}")
-
 async def ApiGetTeamById(
     team_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
 ) -> dict[str, str | TeamDTO]:
     container: Container = request.app.state.container
-    get_team_use_case = container.team().GetTeamByIdProvider(
-        TeamRepository__db=db
-    )
+    get_team_use_case = container.team().GetTeamByIdProvider(TeamRepository__db=db)
 
     try:
         team = get_team_use_case.execute(team_id)
         return {"message": "Team retrieved successfully", "team": team}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
-    
-@router.get("/user/{user_id}")
 
+
+@router.get("/user/{user_id}")
 async def ApiGetTeamsByUserId(
     user_id: uuid.UUID,
     request: Request,
@@ -66,10 +69,10 @@ async def ApiGetTeamsByUserId(
         return {"message": "Teams retrieved successfully", "teams": teams}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
-    
+
+
 # -------------------- UPDATE --------------------
 @router.put("/{team_id}")
-
 async def ApiUpdateTeam(
     user_interactor_id: uuid.UUID,
     new_team_data: UpdateTeamDTO,
@@ -86,10 +89,10 @@ async def ApiUpdateTeam(
         return {"message": "Team updated successfully", "team": updated_team}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
+
+
 # -------------------- DELETE --------------------
 @router.delete("/{team_id}")
-
 async def ApiDeleteTeam(
     interactor_id: uuid.UUID,
     team_to_delete: DeleteTeamDTO,

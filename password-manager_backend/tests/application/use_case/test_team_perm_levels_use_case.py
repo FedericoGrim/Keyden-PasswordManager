@@ -3,7 +3,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from application.dto.team_perm_levels_dto import CreateTeamPermLevelDTO, UpdateTeamPermLevelDTO
+from application.dto.team_perm_levels_dto import (
+    CreateTeamPermLevelDTO,
+    UpdateTeamPermLevelDTO,
+)
 from application.exceptions.team_perm_levels_use_case_exceptions import (
     CreateTeamPermLevelException,
     TeamPermLevelRetrievalException,
@@ -47,7 +50,9 @@ class TestCreateTeamPermLevelUseCase:
 
 class TestGetTeamPermLevelByIdUseCase:
     def test_returns_dto(self, repo):
-        perm_level = TeamPermLevel(id=uuid.uuid4(), team_id=uuid.uuid4(), name="Owner", rank=0)
+        perm_level = TeamPermLevel(
+            id=uuid.uuid4(), team_id=uuid.uuid4(), name="Owner", rank=0
+        )
         repo.GetTeamPermLevelById.return_value = perm_level
 
         result = GetTeamPermLevelByIdUseCase(repo).execute(perm_level.id)
@@ -85,13 +90,19 @@ class TestGetAllTeamPermLevelsByTeamIdUseCase:
 class TestUpdateTeamPermLevelByIdUseCase:
     def test_looks_up_existing_then_updates(self, repo):
         perm_level_id = uuid.uuid4()
-        existing = TeamPermLevel(id=perm_level_id, team_id=uuid.uuid4(), name="Owner", rank=0)
-        updated = TeamPermLevel(id=perm_level_id, team_id=existing.team_id, name="Admin", rank=0)
+        existing = TeamPermLevel(
+            id=perm_level_id, team_id=uuid.uuid4(), name="Owner", rank=0
+        )
+        updated = TeamPermLevel(
+            id=perm_level_id, team_id=existing.team_id, name="Admin", rank=0
+        )
         repo.GetTeamPermLevelById.return_value = existing
         repo.UpdateTeamPermLevelById.return_value = updated
 
         dto = UpdateTeamPermLevelDTO(name="Admin")
-        result = UpdateTeamPermLevelByIdUseCase(repo).execute(perm_level_id, dto, uuid.uuid4())
+        result = UpdateTeamPermLevelByIdUseCase(repo).execute(
+            perm_level_id, dto, uuid.uuid4()
+        )
 
         assert result.name == "Admin"
         repo.GetTeamPermLevelById.assert_called_once_with(perm_level_id)
@@ -100,14 +111,18 @@ class TestUpdateTeamPermLevelByIdUseCase:
         repo.GetTeamPermLevelById.side_effect = Exception("missing")
 
         with pytest.raises(TeamPermLevelUpdateException):
-            UpdateTeamPermLevelByIdUseCase(repo).execute(uuid.uuid4(), UpdateTeamPermLevelDTO(name="Admin"), uuid.uuid4())
+            UpdateTeamPermLevelByIdUseCase(repo).execute(
+                uuid.uuid4(), UpdateTeamPermLevelDTO(name="Admin"), uuid.uuid4()
+            )
 
 
 class TestDeleteTeamPermLevelByIdUseCase:
     def test_returns_repository_result(self, repo):
         repo.DeleteTeamPermLevelById.return_value = True
 
-        result = DeleteTeamPermLevelByIdUseCase(repo).execute(uuid.uuid4(), uuid.uuid4())
+        result = DeleteTeamPermLevelByIdUseCase(repo).execute(
+            uuid.uuid4(), uuid.uuid4()
+        )
 
         assert result is True
 

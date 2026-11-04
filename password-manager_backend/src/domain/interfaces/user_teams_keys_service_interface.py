@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 from domain.entities.user_teams_keys import UserTeamKey
 
+
 @abstractmethod
 class IUserTeamKeyService(ABC):
     @abstractmethod

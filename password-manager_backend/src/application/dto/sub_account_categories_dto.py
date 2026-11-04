@@ -21,4 +21,3 @@ class CreateSubAccountCategoryDTO(BaseModel):
         return SubAccountCategories(
             sub_account_id=self.sub_account_id, category_id=self.category_id
         )
-

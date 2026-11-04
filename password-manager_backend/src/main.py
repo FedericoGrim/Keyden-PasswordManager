@@ -7,13 +7,25 @@ from infrastructure.auth.oidc_authentication import jwt_authentication
 from presentation.controllers.user_controller import router as user_router
 from presentation.controllers.sub_account_controller import router as subaccount_router
 from presentation.controllers.team_controller import router as team_router
-from presentation.controllers.team_members_controller import router as team_members_router
-from presentation.controllers.user_teams_keys_controller import router as user_teams_keys_router
+from presentation.controllers.team_members_controller import (
+    router as team_members_router,
+)
+from presentation.controllers.user_teams_keys_controller import (
+    router as user_teams_keys_router,
+)
 from presentation.controllers.categories_controller import router as categories_router
-from presentation.controllers.sub_account_categories_controller import router as subacc_categories_router
-from presentation.controllers.team_perm_levels_controller import router as team_perm_levels_router
-from presentation.controllers.user_favorite_controller import router as user_favorites_router
-from presentation.controllers.sub_account_history_controller import router as subaccount_history_router
+from presentation.controllers.sub_account_categories_controller import (
+    router as subacc_categories_router,
+)
+from presentation.controllers.team_perm_levels_controller import (
+    router as team_perm_levels_router,
+)
+from presentation.controllers.user_favorite_controller import (
+    router as user_favorites_router,
+)
+from presentation.controllers.sub_account_history_controller import (
+    router as subaccount_history_router,
+)
 
 from infrastructure.databases.database import SessionLocal
 
@@ -39,17 +51,20 @@ CORS_ALLOWED_ORIGINS = [
 # FastAPI App
 # ------------------------------
 container = Container()
-container.wire(modules=["presentation.controllers.user_controller", 
-                        "presentation.controllers.sub_account_controller", 
-                        "presentation.controllers.team_controller",
-                        "presentation.controllers.team_members_controller",
-                        "presentation.controllers.user_teams_keys_controller",
-                        "presentation.controllers.categories_controller",
-                        "presentation.controllers.sub_account_categories_controller",
-                        "presentation.controllers.team_perm_levels_controller",
-                        "presentation.controllers.user_favorite_controller",
-                        "presentation.controllers.sub_account_history_controller"
-                        ])
+container.wire(
+    modules=[
+        "presentation.controllers.user_controller",
+        "presentation.controllers.sub_account_controller",
+        "presentation.controllers.team_controller",
+        "presentation.controllers.team_members_controller",
+        "presentation.controllers.user_teams_keys_controller",
+        "presentation.controllers.categories_controller",
+        "presentation.controllers.sub_account_categories_controller",
+        "presentation.controllers.team_perm_levels_controller",
+        "presentation.controllers.user_favorite_controller",
+        "presentation.controllers.sub_account_history_controller",
+    ]
+)
 
 app = FastAPI()
 
@@ -133,6 +148,7 @@ app.include_router(
     dependencies=[Depends(jwt_authentication)],
 )
 
+
 # ------------------------------
 # Middlewares DB + Log
 # ------------------------------
@@ -148,7 +164,7 @@ async def DbSessionMiddleware(request: Request, call_next: RequestResponseEndpoi
     except Exception as e:
         request.state.db.rollback()
         raise e
-    
+
     finally:
         request.state.db.close()
 
@@ -160,8 +176,9 @@ async def LogExceptionsMiddleware(request: Request, call_next: RequestResponseEn
     try:
         response = await call_next(request)
         return response
-    
+
     except Exception as e:
         import traceback
+
         traceback.print_exc()
         raise e

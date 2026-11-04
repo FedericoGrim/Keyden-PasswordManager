@@ -59,9 +59,15 @@ class UserService(IUserService):
 
     def get_user_by_keycloak_id(self, keycloak_user_id: uuid.UUID):
         try:
-            user_model = self.db.query(UserModel).filter(UserModel.keycloak_id == keycloak_user_id).first()
+            user_model = (
+                self.db.query(UserModel)
+                .filter(UserModel.keycloak_id == keycloak_user_id)
+                .first()
+            )
             if not user_model:
-                raise UserNotFoundException(f"User with keycloak_id {keycloak_user_id} not found.")
+                raise UserNotFoundException(
+                    f"User with keycloak_id {keycloak_user_id} not found."
+                )
             return _to_domain(user_model)
 
         except UserNotFoundException:
@@ -73,9 +79,15 @@ class UserService(IUserService):
 
     def get_user_by_username_and_code(self, username: str, code: str):
         try:
-            user_model = self.db.query(UserModel).filter(UserModel.username == username, UserModel.code == code).first()
+            user_model = (
+                self.db.query(UserModel)
+                .filter(UserModel.username == username, UserModel.code == code)
+                .first()
+            )
             if not user_model:
-                raise UserNotFoundException(f"User with username {username} and code {code} not found.")
+                raise UserNotFoundException(
+                    f"User with username {username} and code {code} not found."
+                )
             return _to_domain(user_model)
 
         except UserNotFoundException:
@@ -87,7 +99,9 @@ class UserService(IUserService):
 
     def get_user_by_id(self, user_id: uuid.UUID):
         try:
-            user_model = self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            user_model = (
+                self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            )
             if not user_model:
                 raise UserNotFoundException(f"User with id {user_id} not found.")
             return _to_domain(user_model)
@@ -101,7 +115,9 @@ class UserService(IUserService):
 
     def update_user_by_id(self, user_id: uuid.UUID, new_user: User):
         try:
-            user_model = self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            user_model = (
+                self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            )
             if not user_model:
                 raise UserNotFoundException("User not found.")
 
@@ -123,7 +139,9 @@ class UserService(IUserService):
 
     def delete_user_by_id(self, user_id: uuid.UUID) -> dict[str, str]:
         try:
-            user_model = self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            user_model = (
+                self.db.query(UserModel).filter(UserModel.id == user_id).first()
+            )
             if not user_model:
                 raise UserNotFoundException("User not found.")
 
