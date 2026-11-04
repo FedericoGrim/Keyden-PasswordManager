@@ -1,6 +1,13 @@
 import uuid
 
-from application.exceptions.user_teams_keys_use_case_exceptions import *
+from application.exceptions.user_teams_keys_use_case_exceptions import (
+    UserTeamKeyAdditionException,
+    UserTeamKeyRemovalException,
+    UserTeamKeyRetrievalByIdException,
+    UserTeamKeyUpdateException,
+    UserTeamKeysRetrievalByTeamIdException,
+    UserTeamKeysRetrievalByUserIdException,
+)
 from application.dto.user_teams_keys_dto import (
     UserTeamKeyDTO,
     CreateUserTeamKeyDTO,
@@ -12,7 +19,7 @@ from domain.interfaces.user_teams_keys_service_interface import IUserTeamKeyServ
 
 
 class AddUserTeamKeyUseCase:
-    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService):
+    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService) -> None:
         self.user_teams_keys_repository = UserTeamKeyRepository
 
     def execute(
@@ -35,7 +42,7 @@ class AddUserTeamKeyUseCase:
 
 
 class GetUserTeamKeyByIdUseCase:
-    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService):
+    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService) -> None:
         self.user_teams_keys_repository = UserTeamKeyRepository
 
     def execute(self, key_id: uuid.UUID) -> UserTeamKeyDTO:
@@ -53,7 +60,7 @@ class GetUserTeamKeyByIdUseCase:
 
 
 class GetUserTeamKeysByTeamIdUseCase:
-    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService):
+    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService) -> None:
         self.user_teams_keys_repository = UserTeamKeyRepository
 
     def execute(self, team_id: uuid.UUID) -> list[UserTeamKeyDTO]:
@@ -74,7 +81,7 @@ class GetUserTeamKeysByTeamIdUseCase:
 
 
 class GetUserTeamKeysByUserIdUseCase:
-    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService):
+    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService) -> None:
         self.user_teams_keys_repository = UserTeamKeyRepository
 
     def execute(self, user_id: uuid.UUID) -> list[UserTeamKeyDTO]:
@@ -95,7 +102,7 @@ class GetUserTeamKeysByUserIdUseCase:
 
 
 class UpdateUserTeamKeyUseCase:
-    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService):
+    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService) -> None:
         self.user_teams_keys_repository = UserTeamKeyRepository
 
     def execute(
@@ -132,7 +139,7 @@ class UpdateUserTeamKeyUseCase:
 
 
 class RemoveUserTeamKeyUseCase:
-    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService):
+    def __init__(self, UserTeamKeyRepository: IUserTeamKeyService) -> None:
         self.user_teams_keys_repository = UserTeamKeyRepository
 
     def execute(

@@ -1,13 +1,17 @@
 import uuid
 
-from application.exceptions.user_favorite_use_case_exceptions import *
+from application.exceptions.user_favorite_use_case_exceptions import (
+    UserFavoriteAdditionException,
+    UserFavoriteRemovalException,
+    UserFavoriteRetrievalException,
+)
 from application.dto.user_favorite_dto import FavoriteDTO, CreateFavoriteDTO
 
 from domain.interfaces.user_favorite_service_interface import IUserFavoriteService
 
 
 class AddFavoriteUseCase:
-    def __init__(self, UserFavoriteRepository: IUserFavoriteService):
+    def __init__(self, UserFavoriteRepository: IUserFavoriteService) -> None:
         self.user_favorite_repository = UserFavoriteRepository
 
     def execute(self, new_favorite: CreateFavoriteDTO) -> FavoriteDTO:
@@ -27,7 +31,7 @@ class AddFavoriteUseCase:
 
 
 class GetFavoritesByUserIdUseCase:
-    def __init__(self, UserFavoriteRepository: IUserFavoriteService):
+    def __init__(self, UserFavoriteRepository: IUserFavoriteService) -> None:
         self.user_favorite_repository = UserFavoriteRepository
 
     def execute(self, user_id: uuid.UUID) -> list[FavoriteDTO]:
@@ -47,7 +51,7 @@ class GetFavoritesByUserIdUseCase:
 
 
 class RemoveFavoriteUseCase:
-    def __init__(self, UserFavoriteRepository: IUserFavoriteService):
+    def __init__(self, UserFavoriteRepository: IUserFavoriteService) -> None:
         self.user_favorite_repository = UserFavoriteRepository
 
     def execute(self, user_id: uuid.UUID, sub_account_id: uuid.UUID) -> dict[str, str]:

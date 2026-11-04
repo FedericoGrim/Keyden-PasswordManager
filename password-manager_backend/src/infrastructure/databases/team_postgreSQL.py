@@ -3,7 +3,17 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.team_postgreSQL_exceptions import *
+from infrastructure.exceptions.team_postgreSQL_exceptions import (
+    GetTeamByIdNotFoundException,
+    GetTeamByIdRetrivalException,
+    GetTeamsByUserIdNotFoundException,
+    TeamAlreadyExistsException,
+    TeamCreationFailedException,
+    TeamDeleteException,
+    TeamNotFoundException,
+    TeamRetrievalException,
+    TeamUpdateException,
+)
 
 from domain.interfaces.team_service_interface import ITeamService
 from domain.entities.team import Team
@@ -20,7 +30,7 @@ def _to_domain(model: TeamModel) -> Team:
 
 
 class TeamService(ITeamService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.Db = db
 
     def CreateTeam(self, new_team: Team) -> Team:
@@ -43,7 +53,7 @@ class TeamService(ITeamService):
             logging.error(f"Error: {e}")
             raise TeamCreationFailedException()
 
-    def GetTeamById(self, team_id: uuid.UUID):
+    def GetTeamById(self, team_id: uuid.UUID) -> Team:
         try:
             team_model = (
                 self.Db.query(TeamModel).filter(TeamModel.id == team_id).first()
@@ -59,7 +69,7 @@ class TeamService(ITeamService):
             logging.error(f"Error: {e}")
             raise GetTeamByIdRetrivalException()
 
-    def GetTeamsByUserId(self, user_id: uuid.UUID):
+    def GetTeamsByUserId(self, user_id: uuid.UUID) -> list[Team]:
         try:
             team_models: list[TeamModel] = (
                 self.Db.query(TeamModel)

@@ -23,7 +23,7 @@ async def ApiCreateTeam(
     team: CreateTeamDTO,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> dict[str, str]:
     container: Container = request.app.state.container
     create_team_use_case = container.team().CreateTeamProvider(
         TeamRepository__db=db,

@@ -4,9 +4,13 @@ import uuid
 
 from config import Container
 
-from application.dto.sub_account_categories_dto import *
+from application.dto.sub_account_categories_dto import (
+    CreateSubAccountCategoryDTO,
+    SubAccountCategoriesDTO,
+)
 
 from infrastructure.databases.database import get_db
+from domain.entities.sub_account_categories import SubAccountCategories
 
 router = APIRouter()
 
@@ -16,7 +20,7 @@ async def CreateSubAccauntCategory(
     new_subacc_category: CreateSubAccountCategoryDTO,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> tuple[str, SubAccountCategories]:
     container: Container = request.app.state.container
     create_subacc_category_use_case = (
         container.sub_account_categories().CreateSubAccountCategoryProvider(
@@ -36,7 +40,7 @@ async def CreateSubAccauntCategory(
 @router.get("/{subaccount_id}")
 async def GetAllCategoriesBySubAccountId(
     subaccount_id: uuid.UUID, request: Request, db: Session = Depends(get_db)
-):
+) -> tuple[str, list[SubAccountCategoriesDTO]]:
     container: Container = request.app.state.container
     get_subacc_categories_use_case = (
         container.sub_account_categories().GetAllCategoriesBySubAccountIdProvider(
@@ -56,7 +60,7 @@ async def DeleteSubAccauntCategory(
     subacc_category_to_delete: SubAccountCategoriesDTO,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> tuple[str, bool]:
     container: Container = request.app.state.container
     delete_subacc_category_use_case = (
         container.sub_account_categories().DeleteSubAccountCategoryProvider(

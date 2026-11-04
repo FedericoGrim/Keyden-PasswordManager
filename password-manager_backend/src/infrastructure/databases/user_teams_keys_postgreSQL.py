@@ -3,7 +3,6 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.user_teams_keys_postgreSQL_exceptions import *
 
 from domain.interfaces.user_teams_keys_service_interface import IUserTeamKeyService
 from domain.entities.user_teams_keys import UserTeamKey
@@ -20,7 +19,7 @@ def _to_domain(model: UserTeamKeyModel) -> UserTeamKey:
 
 
 class UserTeamKeyService(IUserTeamKeyService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.Db = db
 
     def add_key(self, new_key: UserTeamKey) -> UserTeamKey:

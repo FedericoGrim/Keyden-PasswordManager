@@ -3,7 +3,14 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.sub_account_postgreSQL_exceptions import *
+from infrastructure.exceptions.sub_account_postgreSQL_exceptions import (
+    SubAccountAlreadyExistsException,
+    SubAccountCreationFailedException,
+    SubAccountDeletionException,
+    SubAccountNotFoundException,
+    SubAccountRetrievalException,
+    SubAccountUpdateException,
+)
 
 from domain.interfaces.sub_account_service_interface import ISubAccountService
 from domain.entities.sub_account import SubAccount
@@ -24,7 +31,7 @@ def _to_domain(model: SubAccountModel) -> SubAccount:
 
 
 class SubAccountService(ISubAccountService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.db = db
 
     def CreateSubAccount(self, sub_account: SubAccount) -> SubAccount:

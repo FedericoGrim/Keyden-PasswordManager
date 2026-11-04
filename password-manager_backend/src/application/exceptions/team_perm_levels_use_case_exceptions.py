@@ -1,22 +1,22 @@
 class CreateTeamPermLevelException(Exception):
-    def __init__(self, message: str = "Failed to create team perm level."):
+    def __init__(self, message: str = "Failed to create team perm level.") -> None:
         self.message = message
         super().__init__(self.message)
 
 
 class TeamPermLevelRetrievalException(Exception):
-    def __init__(self, message: str = "Failed to retrieve team perm levels."):
+    def __init__(self, message: str = "Failed to retrieve team perm levels.") -> None:
         self.message = message
         super().__init__(self.message)
 
 
 class TeamPermLevelUpdateException(Exception):
-    def __init__(self, message: str = "Failed to update team perm level."):
+    def __init__(self, message: str = "Failed to update team perm level.") -> None:
         self.message = message
         super().__init__(self.message)
 
 
 class TeamPermLevelDeletionException(Exception):
-    def __init__(self, message: str = "Failed to delete team perm level."):
+    def __init__(self, message: str = "Failed to delete team perm level.") -> None:
         self.message = message
         super().__init__(self.message)

@@ -6,10 +6,10 @@ class PostgreSqlConnectionException(Exception):
     This can include errors related to network issues, authentication failures, or database server unavailability.
 
     Args:
-        message (str): Explanation of the error. Defaults to "PostgreSQL connection error occurred
-    """
+        message (str): Explanation of the error. Defaults to "PostgreSQL connection error occurred".
+    """  # noqa: E501
 
-    def __init__(self, message: str = "PostgreSQL connection error occurred"):
+    def __init__(self, message: str = "PostgreSQL connection error occurred") -> None:
         self.message = message
         super().__init__(self.message)
 
@@ -23,8 +23,8 @@ class PostgreSqlException(Exception):
 
     Args:
         message (str): Explanation of the error. Defaults to "PostgreSQL error occurred".
-    """
+    """  # noqa: E501
 
-    def __init__(self, message: str = "PostgreSQL error occurred"):
+    def __init__(self, message: str = "PostgreSQL error occurred") -> None:
         self.message = message
         super().__init__(self.message)

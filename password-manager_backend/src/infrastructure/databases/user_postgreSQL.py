@@ -3,7 +3,14 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.user_postrgreSQL_exceptions import *
+from infrastructure.exceptions.user_postrgreSQL_exceptions import (
+    GetUserByIdRetrivalException,
+    UserAlreadyExistsException,
+    UserCreationFailedException,
+    UserDeleteException,
+    UserNotFoundException,
+    UserUpdateFailedException,
+)
 
 from domain.interfaces.user_service_interface import IUserService
 from domain.entities.user import User
@@ -25,7 +32,7 @@ def _to_domain(model: UserModel) -> User:
 
 
 class UserService(IUserService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.db = db
 
     def create_user(self, new_user: User) -> User:
@@ -57,7 +64,7 @@ class UserService(IUserService):
             logging.error(f"Error: {e}")
             raise UserCreationFailedException()
 
-    def get_user_by_keycloak_id(self, keycloak_user_id: uuid.UUID):
+    def get_user_by_keycloak_id(self, keycloak_user_id: uuid.UUID) -> User:
         try:
             user_model = (
                 self.db.query(UserModel)
@@ -77,7 +84,7 @@ class UserService(IUserService):
             logging.error(f"Error: {e}")
             raise GetUserByIdRetrivalException()
 
-    def get_user_by_username_and_code(self, username: str, code: str):
+    def get_user_by_username_and_code(self, username: str, code: str) -> User:
         try:
             user_model = (
                 self.db.query(UserModel)
@@ -97,7 +104,7 @@ class UserService(IUserService):
             logging.error(f"Error: {e}")
             raise GetUserByIdRetrivalException()
 
-    def get_user_by_id(self, user_id: uuid.UUID):
+    def get_user_by_id(self, user_id: uuid.UUID) -> User:
         try:
             user_model = (
                 self.db.query(UserModel).filter(UserModel.id == user_id).first()
@@ -113,7 +120,7 @@ class UserService(IUserService):
             logging.error(f"Error: {e}")
             raise GetUserByIdRetrivalException()
 
-    def update_user_by_id(self, user_id: uuid.UUID, new_user: User):
+    def update_user_by_id(self, user_id: uuid.UUID, new_user: User) -> User:
         try:
             user_model = (
                 self.db.query(UserModel).filter(UserModel.id == user_id).first()

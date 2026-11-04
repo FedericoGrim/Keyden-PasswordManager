@@ -3,7 +3,15 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.categories_postgresql_exceptions import *
+from infrastructure.exceptions.categories_postgresql_exceptions import (
+    CategoryAlreadyExistsException,
+    CategoryCreationFailedException,
+    CategoryDeletionException,
+    CategoryNotFoundException,
+    CategoryRetrievalException,
+    CategoryUpdateException,
+    GetAllCategoriesByTeamIdNotFoundException,
+)
 
 from domain.interfaces.icategories import ICategoriesService
 from domain.entities.categories import Category
@@ -19,7 +27,7 @@ def _to_domain(model: CategoriesModel) -> Category:
 
 
 class CategoriesService(ICategoriesService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.Db = db
 
     def CreateCategory(self, category: Category) -> Category:
@@ -71,7 +79,8 @@ class CategoriesService(ICategoriesService):
             if not category_model:
                 raise CategoryNotFoundException("Category not found.")
 
-            category_model.name = new_category.name
+            if new_category.name is not None:
+                category_model.name = new_category.name
 
             self.Db.commit()
             self.Db.refresh(category_model)

@@ -13,7 +13,8 @@ from jose import JWTError, jwt
 
 HTTP_TIMEOUT_SECONDS = 5
 JWKS_MIN_REFRESH_SECONDS = 60
-# Asymmetric only: HS* would let anyone holding a public key forge tokens, "none" skips signing.
+# Asymmetric only: HS* would let anyone holding a public key forge tokens,
+# "none" skips signing.
 ALLOWED_ALGORITHMS = ["RS256", "RS384", "RS512", "ES256", "ES384", "ES512"]
 
 bearer_scheme = HTTPBearer()
@@ -56,11 +57,12 @@ def _signing_key(kid: str) -> dict[str, Any]:
     return _jwks_keys[kid]
 
 
-# Sync on purpose: FastAPI runs it in a threadpool, so the blocking IdP fetch never stalls the event loop.
+# Sync on purpose: FastAPI runs it in a threadpool, so the blocking IdP fetch
+# never stalls the event loop.
 def jwt_authentication(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ) -> dict[str, Any]:
-    """Verifies the bearer token against the OIDC issuer's JWKS and returns its payload."""
+    """Verifies the bearer token against the OIDC issuer's JWKS and returns its payload."""  # noqa: E501
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid or expired token",

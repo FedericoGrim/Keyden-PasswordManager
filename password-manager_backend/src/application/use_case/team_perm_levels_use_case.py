@@ -1,18 +1,28 @@
-from application.dto.team_perm_levels_dto import *
-from application.exceptions.team_perm_levels_use_case_exceptions import *
+from application.dto.team_perm_levels_dto import (
+    CreateTeamPermLevelDTO,
+    TeamPermLevelDTO,
+    UpdateTeamPermLevelDTO,
+)
+from application.exceptions.team_perm_levels_use_case_exceptions import (
+    CreateTeamPermLevelException,
+    TeamPermLevelDeletionException,
+    TeamPermLevelRetrievalException,
+    TeamPermLevelUpdateException,
+)
 
 from domain.interfaces.team_perm_level_service_interface import ITeamPermLevelService
 
 import uuid
+from domain.entities.team_perm_level import TeamPermLevel
 
 
 class CreateTeamPermLevelUseCase:
-    def __init__(self, TeamPermLevelRepository: ITeamPermLevelService):
+    def __init__(self, TeamPermLevelRepository: ITeamPermLevelService) -> None:
         self.TeamPermLevelRepository = TeamPermLevelRepository
 
     def execute(
         self, perm_level: CreateTeamPermLevelDTO, user_interactor_id: uuid.UUID
-    ) -> TeamPermLevelDTO:
+    ) -> TeamPermLevel:
         try:
             perm_level_entity = perm_level.to_entity()
             result = self.TeamPermLevelRepository.CreateTeamPermLevel(perm_level_entity)
@@ -24,7 +34,7 @@ class CreateTeamPermLevelUseCase:
 
 
 class GetTeamPermLevelByIdUseCase:
-    def __init__(self, TeamPermLevelRepository: ITeamPermLevelService):
+    def __init__(self, TeamPermLevelRepository: ITeamPermLevelService) -> None:
         self.TeamPermLevelRepository = TeamPermLevelRepository
 
     def execute(self, perm_level_id: uuid.UUID) -> TeamPermLevelDTO:
@@ -44,7 +54,7 @@ class GetTeamPermLevelByIdUseCase:
 
 
 class GetAllTeamPermLevelsByTeamIdUseCase:
-    def __init__(self, TeamPermLevelRepository: ITeamPermLevelService):
+    def __init__(self, TeamPermLevelRepository: ITeamPermLevelService) -> None:
         self.TeamPermLevelRepository = TeamPermLevelRepository
 
     def execute(self, teamId: uuid.UUID) -> list[TeamPermLevelDTO]:
@@ -66,7 +76,7 @@ class GetAllTeamPermLevelsByTeamIdUseCase:
 
 
 class UpdateTeamPermLevelByIdUseCase:
-    def __init__(self, TeamPermLevelRepository: ITeamPermLevelService):
+    def __init__(self, TeamPermLevelRepository: ITeamPermLevelService) -> None:
         self.TeamPermLevelRepository = TeamPermLevelRepository
 
     def execute(
@@ -95,7 +105,7 @@ class UpdateTeamPermLevelByIdUseCase:
 
 
 class DeleteTeamPermLevelByIdUseCase:
-    def __init__(self, TeamPermLevelRepository: ITeamPermLevelService):
+    def __init__(self, TeamPermLevelRepository: ITeamPermLevelService) -> None:
         self.TeamPermLevelRepository = TeamPermLevelRepository
 
     def execute(self, perm_level_id: uuid.UUID, user_interactor_id: uuid.UUID) -> bool:

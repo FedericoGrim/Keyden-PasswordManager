@@ -1,10 +1,12 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 import os
 import logging
 from dotenv import load_dotenv
 
 from infrastructure.exceptions.database_exception import PostgreSqlConnectionException
+from collections.abc import Generator
+from typing import Any
 
 load_dotenv()
 
@@ -21,7 +23,7 @@ engine = create_engine(
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 
-def get_db():
+def get_db() -> Generator[Session, Any, None]:
     db = SessionLocal()
     try:
         yield db

@@ -29,7 +29,7 @@ def repo() -> MagicMock:
 
 
 class TestCreateSubAccountCategoryUseCase:
-    def test_creates_and_returns_repository_result(self, repo: MagicMock):
+    def test_creates_and_returns_repository_result(self, repo: MagicMock) -> None:
         created = SubAccountCategories(
             id=uuid.uuid4(), sub_account_id=uuid.uuid4(), category_id=uuid.uuid4()
         )
@@ -42,7 +42,7 @@ class TestCreateSubAccountCategoryUseCase:
 
         assert result is created
 
-    def test_wraps_repository_errors(self, repo: MagicMock):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.CreateSubAccountCategory.side_effect = Exception("duplicate")
         dto = CreateSubAccountCategoryDTO(
             sub_account_id=uuid.uuid4(), category_id=uuid.uuid4()
@@ -53,7 +53,7 @@ class TestCreateSubAccountCategoryUseCase:
 
 
 class TestGetAllCategoriesBySubAccountIdUseCase:
-    def test_maps_entities_to_dtos(self, repo: MagicMock):
+    def test_maps_entities_to_dtos(self, repo: MagicMock) -> None:
         sub_account_id = uuid.uuid4()
         entities = [
             SubAccountCategories(
@@ -70,7 +70,7 @@ class TestGetAllCategoriesBySubAccountIdUseCase:
         assert len(result) == 2
         assert all(dto.sub_account_id == sub_account_id for dto in result)
 
-    def test_wraps_repository_errors(self, repo: MagicMock):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.GetAllCategoriesBySubAccountId.side_effect = Exception("none")
 
         with pytest.raises(SubAccountCategoryRetrievalException):
@@ -78,7 +78,7 @@ class TestGetAllCategoriesBySubAccountIdUseCase:
 
 
 class TestDeleteSubAccountCategoryUseCase:
-    def test_returns_repository_result(self, repo: MagicMock):
+    def test_returns_repository_result(self, repo: MagicMock) -> None:
         repo.DeleteSubAccountCategory.return_value = True
         dto = SubAccountCategoriesDTO(
             sub_account_id=uuid.uuid4(), category_id=uuid.uuid4()
@@ -88,7 +88,7 @@ class TestDeleteSubAccountCategoryUseCase:
 
         assert result is True
 
-    def test_wraps_repository_errors(self, repo: MagicMock):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.DeleteSubAccountCategory.side_effect = Exception("not found")
         dto = SubAccountCategoriesDTO(
             sub_account_id=uuid.uuid4(), category_id=uuid.uuid4()

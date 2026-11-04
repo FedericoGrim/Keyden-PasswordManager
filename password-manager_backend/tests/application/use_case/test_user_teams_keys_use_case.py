@@ -1,3 +1,4 @@
+from typing import Any
 import uuid
 from unittest.mock import MagicMock
 
@@ -29,12 +30,12 @@ from domain.interfaces.user_teams_keys_service_interface import IUserTeamKeyServ
 
 
 @pytest.fixture
-def repo():
+def repo() -> MagicMock:
     return MagicMock(spec=IUserTeamKeyService)
 
 
-def make_key(**overrides):
-    defaults = dict(
+def make_key(**overrides: Any) -> UserTeamKey:  # noqa: ANN401
+    defaults: dict[str, Any] = dict(
         id=uuid.uuid4(),
         user_id=uuid.uuid4(),
         team_id=uuid.uuid4(),
@@ -45,7 +46,7 @@ def make_key(**overrides):
 
 
 class TestAddUserTeamKeyUseCase:
-    def test_returns_dto_from_repository_result(self, repo):
+    def test_returns_dto_from_repository_result(self, repo: MagicMock) -> None:
         key = make_key()
         repo.add_key.return_value = key
 
@@ -56,7 +57,7 @@ class TestAddUserTeamKeyUseCase:
 
         assert result.id == key.id
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.add_key.side_effect = Exception("already exists")
         dto = CreateUserTeamKeyDTO(
             user_id=uuid.uuid4(), team_id=uuid.uuid4(), team_key_encrypted="k"
@@ -67,15 +68,16 @@ class TestAddUserTeamKeyUseCase:
 
 
 class TestGetUserTeamKeyByIdUseCase:
-    def test_returns_dto(self, repo):
+    def test_returns_dto(self, repo: MagicMock) -> None:
         key = make_key()
         repo.get_key_by_id.return_value = key
 
+        assert key.id is not None
         result = GetUserTeamKeyByIdUseCase(repo).execute(key.id)
 
         assert result.team_key_encrypted == "enc-key"
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.get_key_by_id.side_effect = Exception("not found")
 
         with pytest.raises(UserTeamKeyRetrievalByIdException):
@@ -83,7 +85,7 @@ class TestGetUserTeamKeyByIdUseCase:
 
 
 class TestGetUserTeamKeysByTeamIdUseCase:
-    def test_maps_entities_to_dtos(self, repo):
+    def test_maps_entities_to_dtos(self, repo: MagicMock) -> None:
         team_id = uuid.uuid4()
         keys = [make_key(team_id=team_id), make_key(team_id=team_id)]
         repo.get_keys_by_team_id.return_value = keys
@@ -92,7 +94,7 @@ class TestGetUserTeamKeysByTeamIdUseCase:
 
         assert len(result) == 2
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.get_keys_by_team_id.side_effect = Exception("boom")
 
         with pytest.raises(UserTeamKeysRetrievalByTeamIdException):
@@ -100,7 +102,7 @@ class TestGetUserTeamKeysByTeamIdUseCase:
 
 
 class TestGetUserTeamKeysByUserIdUseCase:
-    def test_maps_entities_to_dtos(self, repo):
+    def test_maps_entities_to_dtos(self, repo: MagicMock) -> None:
         user_id = uuid.uuid4()
         keys = [make_key(user_id=user_id)]
         repo.get_keys_by_user_id.return_value = keys
@@ -109,7 +111,7 @@ class TestGetUserTeamKeysByUserIdUseCase:
 
         assert len(result) == 1
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.get_keys_by_user_id.side_effect = Exception("boom")
 
         with pytest.raises(UserTeamKeysRetrievalByUserIdException):
@@ -117,7 +119,7 @@ class TestGetUserTeamKeysByUserIdUseCase:
 
 
 class TestUpdateUserTeamKeyUseCase:
-    def test_finds_matching_team_key_then_updates(self, repo):
+    def test_finds_matching_team_key_then_updates(self, repo: MagicMock) -> None:
         user_id, team_id = uuid.uuid4(), uuid.uuid4()
         existing = make_key(
             user_id=user_id, team_id=team_id, team_key_encrypted="old-key"
@@ -141,7 +143,7 @@ class TestUpdateUserTeamKeyUseCase:
 
         assert result.team_key_encrypted == "new-key"
 
-    def test_raises_when_no_key_for_team(self, repo):
+    def test_raises_when_no_key_for_team(self, repo: MagicMock) -> None:
         user_id, team_id = uuid.uuid4(), uuid.uuid4()
         repo.get_keys_by_user_id.return_value = []
 
@@ -154,7 +156,7 @@ class TestUpdateUserTeamKeyUseCase:
 
         assert "not found" in str(exc_info.value).lower()
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.get_keys_by_user_id.side_effect = Exception("db error")
         dto = UpdateUserTeamKeyDTO(
             user_id=uuid.uuid4(), team_id=uuid.uuid4(), team_key_encrypted="k"
@@ -165,7 +167,7 @@ class TestUpdateUserTeamKeyUseCase:
 
 
 class TestRemoveUserTeamKeyUseCase:
-    def test_returns_repository_result(self, repo):
+    def test_returns_repository_result(self, repo: MagicMock) -> None:
         repo.remove_key.return_value = {"message": "Key removed successfully."}
         user_id, team_id = uuid.uuid4(), uuid.uuid4()
 
@@ -176,7 +178,7 @@ class TestRemoveUserTeamKeyUseCase:
         assert result == {"message": "Key removed successfully."}
         repo.remove_key.assert_called_once_with(user_id=user_id, team_id=team_id)
 
-    def test_wraps_repository_errors(self, repo):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.remove_key.side_effect = Exception("not found")
 
         with pytest.raises(UserTeamKeyRemovalException):

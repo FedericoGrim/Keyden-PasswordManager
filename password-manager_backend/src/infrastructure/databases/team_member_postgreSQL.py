@@ -3,7 +3,6 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.team_member_postgreSQL_exceptions import *
 
 from domain.interfaces.team_member_service_interface import ITeamMembersService
 from domain.entities.team_member import TeamMember
@@ -20,7 +19,7 @@ def _to_domain(model: TeamMemberModel) -> TeamMember:
 
 
 class TeamMembersService(ITeamMembersService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.Db = db
 
     def add_member_to_team(self, new_member: TeamMember) -> TeamMember:

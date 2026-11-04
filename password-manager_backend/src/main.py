@@ -153,7 +153,9 @@ app.include_router(
 # Middlewares DB + Log
 # ------------------------------
 @app.middleware("http")
-async def DbSessionMiddleware(request: Request, call_next: RequestResponseEndpoint):
+async def DbSessionMiddleware(
+    request: Request, call_next: RequestResponseEndpoint
+) -> Response:
     response = Response("Internal server error", status_code=500)
     request.state.db = SessionLocal()
     try:
@@ -172,7 +174,9 @@ async def DbSessionMiddleware(request: Request, call_next: RequestResponseEndpoi
 
 
 @app.middleware("http")
-async def LogExceptionsMiddleware(request: Request, call_next: RequestResponseEndpoint):
+async def LogExceptionsMiddleware(
+    request: Request, call_next: RequestResponseEndpoint
+) -> Response:
     try:
         response = await call_next(request)
         return response

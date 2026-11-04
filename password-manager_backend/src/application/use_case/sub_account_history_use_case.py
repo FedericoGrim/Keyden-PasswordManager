@@ -1,7 +1,9 @@
 import uuid
 
 from application.dto.sub_account_history_dto import SubAccountHistoryDTO
-from application.exceptions.sub_account_history_use_case_exceptions import *
+from application.exceptions.sub_account_history_use_case_exceptions import (
+    SubAccountHistoryRetrievalException,
+)
 
 from domain.interfaces.sub_account_history_service_interface import (
     ISubAccountHistoryService,
@@ -9,7 +11,7 @@ from domain.interfaces.sub_account_history_service_interface import (
 
 
 class GetSubAccountHistoryBySubAccountIdUseCase:
-    def __init__(self, SubAccountHistoryRepository: ISubAccountHistoryService):
+    def __init__(self, SubAccountHistoryRepository: ISubAccountHistoryService) -> None:
         self.SubAccountHistoryRepository = SubAccountHistoryRepository
 
     def execute(self, sub_account_id: uuid.UUID) -> list[SubAccountHistoryDTO]:
@@ -40,7 +42,7 @@ class GetSubAccountHistoryBySubAccountIdUseCase:
 class GetSubAccountHistoryByTeamIdUseCase:
     """Feeds rotateTeamKey: every history row that needs its dek_wrapped re-wrapped."""
 
-    def __init__(self, SubAccountHistoryRepository: ISubAccountHistoryService):
+    def __init__(self, SubAccountHistoryRepository: ISubAccountHistoryService) -> None:
         self.SubAccountHistoryRepository = SubAccountHistoryRepository
 
     def execute(self, team_id: uuid.UUID) -> list[SubAccountHistoryDTO]:

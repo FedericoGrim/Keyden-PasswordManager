@@ -7,7 +7,12 @@ from application.dto.sub_account_dto import (
     DeleteSubAccountDTO,
     RotateSubAccountDeksDTO,
 )
-from application.exceptions.sub_account_use_case_exceptions import *
+from application.exceptions.sub_account_use_case_exceptions import (
+    CreateSubAccountException,
+    SubAccountDeletionException,
+    SubAccountRetrievalException,
+    SubAccountUpdateException,
+)
 from application.exceptions.sub_account_history_use_case_exceptions import (
     RotateSubAccountDeksException,
 )
@@ -17,13 +22,16 @@ from domain.interfaces.sub_account_history_service_interface import (
     ISubAccountHistoryService,
 )
 from domain.entities.sub_account_history import SubAccountHistory
+from domain.entities.sub_account import SubAccount
 
 
 class CreateSubAccountUseCase:
-    def __init__(self, SubAccountRepository: ISubAccountService):
+    def __init__(self, SubAccountRepository: ISubAccountService) -> None:
         self.SubAccountRepository = SubAccountRepository
 
-    def execute(self, interactor_id: uuid.UUID, subaccount_create: CreateSubAccountDTO):
+    def execute(
+        self, interactor_id: uuid.UUID, subaccount_create: CreateSubAccountDTO
+    ) -> SubAccount:
         try:
             subaccount_entity = subaccount_create.to_entity()
             result = self.SubAccountRepository.CreateSubAccount(subaccount_entity)
@@ -34,10 +42,10 @@ class CreateSubAccountUseCase:
 
 
 class GetSubAccountByIdUseCase:
-    def __init__(self, SubAccountRepository: ISubAccountService):
+    def __init__(self, SubAccountRepository: ISubAccountService) -> None:
         self.SubAccountRepository = SubAccountRepository
 
-    def execute(self, subaccountId: uuid.UUID):
+    def execute(self, subaccountId: uuid.UUID) -> SubAccount:
         try:
             return self.SubAccountRepository.GetSubAccountById(subaccountId)
         except Exception as e:
@@ -45,10 +53,10 @@ class GetSubAccountByIdUseCase:
 
 
 class GetAllSubAccountsByTeamIdUseCase:
-    def __init__(self, SubAccountRepository: ISubAccountService):
+    def __init__(self, SubAccountRepository: ISubAccountService) -> None:
         self.SubAccountRepository = SubAccountRepository
 
-    def execute(self, teamId: uuid.UUID):
+    def execute(self, teamId: uuid.UUID) -> list[SubAccountDTO]:
         try:
             result = self.SubAccountRepository.GetAllSubAccountsByTeamId(teamId)
             return [
@@ -75,7 +83,7 @@ class UpdateSubAccountByIdUseCase:
         self,
         SubAccountRepository: ISubAccountService,
         SubAccountHistoryRepository: ISubAccountHistoryService,
-    ):
+    ) -> None:
         self.SubAccountRepository = SubAccountRepository
         self.SubAccountHistoryRepository = SubAccountHistoryRepository
 
@@ -91,7 +99,7 @@ class UpdateSubAccountByIdUseCase:
             # dek_wrapped as the live row, so it rotates together with it.
             self.SubAccountHistoryRepository.CreateHistoryEntry(
                 SubAccountHistory(
-                    sub_account_id=existing_subaccount.id,
+                    sub_account_id=uuid.UUID(str(existing_subaccount.id)),
                     username_encrypted=existing_subaccount.username_encrypted,
                     email_encrypted=existing_subaccount.email_encrypted,
                     password_encrypted=existing_subaccount.password_encrypted,
@@ -121,12 +129,12 @@ class UpdateSubAccountByIdUseCase:
 
 
 class DeleteSubAccountByIdUseCase:
-    def __init__(self, SubAccountRepository: ISubAccountService):
+    def __init__(self, SubAccountRepository: ISubAccountService) -> None:
         self.SubAccountRepository = SubAccountRepository
 
     def execute(
         self, interactor_id: uuid.UUID, subaccount_to_delete: DeleteSubAccountDTO
-    ):
+    ) -> dict[str, str]:
         try:
             result = self.SubAccountRepository.DeleteSubAccountById(
                 subaccount_to_delete.id
@@ -146,7 +154,7 @@ class RotateSubAccountDeksUseCase:
         self,
         SubAccountRepository: ISubAccountService,
         SubAccountHistoryRepository: ISubAccountHistoryService,
-    ):
+    ) -> None:
         self.SubAccountRepository = SubAccountRepository
         self.SubAccountHistoryRepository = SubAccountHistoryRepository
 

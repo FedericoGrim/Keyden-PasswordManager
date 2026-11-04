@@ -2,7 +2,12 @@ from sqlalchemy.orm import Session
 import uuid
 import logging
 
-from infrastructure.exceptions.sub_account_history_postgreSQL_exceptions import *
+from infrastructure.exceptions.sub_account_history_postgreSQL_exceptions import (
+    SubAccountHistoryCreationFailedException,
+    SubAccountHistoryDekUpdateException,
+    SubAccountHistoryNotFoundException,
+    SubAccountHistoryRetrievalException,
+)
 
 from domain.interfaces.sub_account_history_service_interface import (
     ISubAccountHistoryService,
@@ -29,7 +34,7 @@ def _to_domain(model: SubAccountHistoryModel) -> SubAccountHistory:
 
 
 class SubAccountHistoryService(ISubAccountHistoryService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.db = db
 
     def CreateHistoryEntry(self, entry: SubAccountHistory) -> SubAccountHistory:

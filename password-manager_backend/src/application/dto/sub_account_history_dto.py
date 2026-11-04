@@ -12,4 +12,4 @@ class SubAccountHistoryDTO(BaseModel):
     site_link_encrypted: Optional[str]
     dek_wrapped: Optional[str]
     changed_by: Optional[UUID4]
-    changed_at: datetime
+    changed_at: Optional[datetime]

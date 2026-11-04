@@ -13,13 +13,13 @@ class UserDTO(BaseModel):
     username: str
     code: str
 
-    salt: str | None
+    salt: str
 
     public_key_ec: bytes
-    private_key_ec: bytes | None
+    private_key_ec: bytes
 
     public_key_pq: bytes
-    private_key_pq: bytes | None
+    private_key_pq: bytes
 
     @classmethod
     def from_entity(cls, entity: User) -> "UserDTO":

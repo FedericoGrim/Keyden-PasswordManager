@@ -26,7 +26,7 @@ def repo() -> MagicMock:
 
 
 class TestCreateCategoriesUseCase:
-    def test_creates_and_returns_repository_result(self, repo: MagicMock):
+    def test_creates_and_returns_repository_result(self, repo: MagicMock) -> None:
         team_id = uuid.uuid4()
         created = Category(id=uuid.uuid4(), team_id=team_id, name="Work")
         repo.CreateCategory.return_value = created
@@ -37,7 +37,7 @@ class TestCreateCategoriesUseCase:
 
         assert result is created
 
-    def test_wraps_repository_errors(self, repo: MagicMock):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.CreateCategory.side_effect = Exception("duplicate")
 
         with pytest.raises(CreateCategoryException):
@@ -47,7 +47,7 @@ class TestCreateCategoriesUseCase:
 
 
 class TestGetAllCategoriesByTeamIdUseCase:
-    def test_maps_entities_to_dtos(self, repo: MagicMock):
+    def test_maps_entities_to_dtos(self, repo: MagicMock) -> None:
         team_id = uuid.uuid4()
         categories = [
             Category(id=uuid.uuid4(), team_id=team_id, name="Work"),
@@ -59,7 +59,7 @@ class TestGetAllCategoriesByTeamIdUseCase:
 
         assert {dto.name for dto in result} == {"Work", "Personal"}
 
-    def test_wraps_repository_errors(self, repo: MagicMock):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.GetAllCategoriesByTeamId.side_effect = Exception("none")
 
         with pytest.raises(CategoryRetrievalException):
@@ -67,7 +67,7 @@ class TestGetAllCategoriesByTeamIdUseCase:
 
 
 class TestUpdateCategoryByIdUseCase:
-    def test_returns_updated_dto(self, repo: MagicMock):
+    def test_returns_updated_dto(self, repo: MagicMock) -> None:
         category_id = uuid.uuid4()
         updated = Category(id=category_id, team_id=uuid.uuid4(), name="Renamed")
         repo.UpdateCategoryById.return_value = updated
@@ -80,7 +80,7 @@ class TestUpdateCategoryByIdUseCase:
         repo.UpdateCategoryById.assert_called_once()
         assert repo.UpdateCategoryById.call_args.args[0] == category_id
 
-    def test_wraps_repository_errors(self, repo: MagicMock):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.UpdateCategoryById.side_effect = Exception("not found")
 
         with pytest.raises(CategoryUpdateException):
@@ -90,14 +90,14 @@ class TestUpdateCategoryByIdUseCase:
 
 
 class TestDeleteCategoryByIdUseCase:
-    def test_returns_repository_result(self, repo: MagicMock):
+    def test_returns_repository_result(self, repo: MagicMock) -> None:
         repo.DeleteCategoryById.return_value = True
 
         result = DeleteCategoryByIdUseCase(repo).execute(uuid.uuid4(), uuid.uuid4())
 
         assert result is True
 
-    def test_wraps_repository_errors(self, repo: MagicMock):
+    def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.DeleteCategoryById.side_effect = Exception("not found")
 
         with pytest.raises(CategoryDeletionException):

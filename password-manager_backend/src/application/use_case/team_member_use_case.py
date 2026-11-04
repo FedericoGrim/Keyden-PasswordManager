@@ -1,6 +1,12 @@
 import uuid
 
-from application.exceptions.team_member_use_case_exceptions import *
+from application.exceptions.team_member_use_case_exceptions import (
+    TeamMemberAdditionException,
+    TeamMemberRemovalException,
+    TeamMemberRetrievalByIdException,
+    TeamMemberRoleUpdateException,
+    TeamMembersRetrievalByTeamIdException,
+)
 from application.dto.team_member_dto import (
     TeamMemberDTO,
     CreateTeamMemberDTO,
@@ -12,7 +18,7 @@ from domain.interfaces.team_member_service_interface import ITeamMembersService
 
 
 class AddMemberToTeamUseCase:
-    def __init__(self, TeamMembersRepository: ITeamMembersService):
+    def __init__(self, TeamMembersRepository: ITeamMembersService) -> None:
         self.team_members_repository = TeamMembersRepository
 
     def execute(
@@ -35,7 +41,7 @@ class AddMemberToTeamUseCase:
 
 
 class GetTeamMemberByIdUseCase:
-    def __init__(self, TeamMembersRepository: ITeamMembersService):
+    def __init__(self, TeamMembersRepository: ITeamMembersService) -> None:
         self.team_members_repository = TeamMembersRepository
 
     def execute(self, member_id: uuid.UUID) -> TeamMemberDTO:
@@ -53,7 +59,7 @@ class GetTeamMemberByIdUseCase:
 
 
 class GetTeamMembersByTeamIdUseCase:
-    def __init__(self, TeamMembersRepository: ITeamMembersService):
+    def __init__(self, TeamMembersRepository: ITeamMembersService) -> None:
         self.team_members_repository = TeamMembersRepository
 
     def execute(self, team_id: uuid.UUID) -> list[TeamMemberDTO]:
@@ -74,7 +80,7 @@ class GetTeamMembersByTeamIdUseCase:
 
 
 class UpdateTeamMemberRoleUseCase:
-    def __init__(self, TeamMembersRepository: ITeamMembersService):
+    def __init__(self, TeamMembersRepository: ITeamMembersService) -> None:
         self.team_members_repository = TeamMembersRepository
 
     def execute(
@@ -101,7 +107,7 @@ class UpdateTeamMemberRoleUseCase:
 
 
 class RemoveMemberFromTeamUseCase:
-    def __init__(self, TeamMembersRepository: ITeamMembersService):
+    def __init__(self, TeamMembersRepository: ITeamMembersService) -> None:
         self.team_members_repository = TeamMembersRepository
 
     def execute(

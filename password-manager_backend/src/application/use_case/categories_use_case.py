@@ -1,18 +1,28 @@
-from application.dto.categories_dto import *
-from application.exceptions.categories_use_case_exceptions import *
+from application.dto.categories_dto import (
+    CategoryDTO,
+    CreateCategoryDTO,
+    UpdateCategoryDTO,
+)
+from application.exceptions.categories_use_case_exceptions import (
+    CategoryDeletionException,
+    CategoryRetrievalException,
+    CategoryUpdateException,
+    CreateCategoryException,
+)
 
 from domain.interfaces.icategories import ICategoriesService
 
 import uuid
+from domain.entities.categories import Category
 
 
 class CreateCategoriesUseCase:
-    def __init__(self, CategoriesRepository: ICategoriesService):
+    def __init__(self, CategoriesRepository: ICategoriesService) -> None:
         self.CategoriesRepository = CategoriesRepository
 
     def execute(
         self, category: CreateCategoryDTO, user_interactor_id: uuid.UUID
-    ) -> CategoryDTO:
+    ) -> Category:
         try:
             category_entity = category.to_entity()
             result = self.CategoriesRepository.CreateCategory(category_entity)
@@ -24,7 +34,7 @@ class CreateCategoriesUseCase:
 
 
 class GetAllCategoriesByTeamIdUseCase:
-    def __init__(self, CategoriesRepository: ICategoriesService):
+    def __init__(self, CategoriesRepository: ICategoriesService) -> None:
         self.CategoriesRepository = CategoriesRepository
 
     def execute(self, teamId: uuid.UUID) -> list[CategoryDTO]:
@@ -43,7 +53,7 @@ class GetAllCategoriesByTeamIdUseCase:
 
 
 class UpdateCategoryByIdUseCase:
-    def __init__(self, CategoriesRepository: ICategoriesService):
+    def __init__(self, CategoriesRepository: ICategoriesService) -> None:
         self.CategoriesRepository = CategoriesRepository
 
     def execute(
@@ -51,7 +61,7 @@ class UpdateCategoryByIdUseCase:
         categoryId: uuid.UUID,
         new_category: UpdateCategoryDTO,
         user_interactor_id: uuid.UUID,
-    ):
+    ) -> CategoryDTO:
         try:
             result = self.CategoriesRepository.UpdateCategoryById(
                 categoryId, new_category.to_entity()
@@ -68,7 +78,7 @@ class UpdateCategoryByIdUseCase:
 
 
 class DeleteCategoryByIdUseCase:
-    def __init__(self, CategoriesRepository: ICategoriesService):
+    def __init__(self, CategoriesRepository: ICategoriesService) -> None:
         self.CategoriesRepository = CategoriesRepository
 
     def execute(self, categoryId: uuid.UUID, user_interactor_id: uuid.UUID) -> bool:

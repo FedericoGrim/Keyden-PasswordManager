@@ -6,16 +6,23 @@ from application.dto.team_dto import (
     UpdateTeamDTO,
     DeleteTeamDTO,
 )
-from application.exceptions.team_use_case_exceptions import *
+from application.exceptions.team_use_case_exceptions import (
+    TeamCreationException,
+    TeamDeleteException,
+    TeamRetrievalByIdException,
+    TeamUpdateException,
+    TeamsRetrievalByUserIdException,
+)
 
 from domain.interfaces.team_service_interface import ITeamService
+from domain.entities.team import Team
 
 
 class CreateTeamUseCase:
-    def __init__(self, TeamRepository: ITeamService):
+    def __init__(self, TeamRepository: ITeamService) -> None:
         self.team_repository = TeamRepository
 
-    def execute(self, interactor_id: uuid.UUID, team_create: CreateTeamDTO):
+    def execute(self, interactor_id: uuid.UUID, team_create: CreateTeamDTO) -> Team:
         try:
             team_entity = team_create.to_entity()
             team = self.team_repository.CreateTeam(team_entity)
@@ -27,10 +34,10 @@ class CreateTeamUseCase:
 
 
 class GetTeamByIdUseCase:
-    def __init__(self, TeamRepository: ITeamService):
+    def __init__(self, TeamRepository: ITeamService) -> None:
         self.team_repository = TeamRepository
 
-    def execute(self, team_id: uuid.UUID):
+    def execute(self, team_id: uuid.UUID) -> TeamDTO:
         try:
             team = self.team_repository.GetTeamById(team_id)
             return TeamDTO(
@@ -44,10 +51,10 @@ class GetTeamByIdUseCase:
 
 
 class GetTeamsByUserIdUseCase:
-    def __init__(self, TeamRepository: ITeamService):
+    def __init__(self, TeamRepository: ITeamService) -> None:
         self.team_repository = TeamRepository
 
-    def execute(self, user_id: uuid.UUID):
+    def execute(self, user_id: uuid.UUID) -> list[TeamDTO]:
         try:
             teams = self.team_repository.GetTeamsByUserId(user_id)
             return [
@@ -64,10 +71,10 @@ class GetTeamsByUserIdUseCase:
 
 
 class UpdateTeamByIdUseCase:
-    def __init__(self, TeamRepository: ITeamService):
+    def __init__(self, TeamRepository: ITeamService) -> None:
         self.team_repository = TeamRepository
 
-    def execute(self, interactor_id: uuid.UUID, new_team: UpdateTeamDTO):
+    def execute(self, interactor_id: uuid.UUID, new_team: UpdateTeamDTO) -> TeamDTO:
         try:
             team_entity = new_team.to_entity(
                 self.team_repository.GetTeamById(new_team.id)
@@ -85,10 +92,10 @@ class UpdateTeamByIdUseCase:
 
 
 class DeleteTeamByIdUseCase:
-    def __init__(self, TeamRepository: ITeamService):
+    def __init__(self, TeamRepository: ITeamService) -> None:
         self.team_repository = TeamRepository
 
-    def execute(self, interactor_id: uuid.UUID, team_to_delete: DeleteTeamDTO):
+    def execute(self, interactor_id: uuid.UUID, team_to_delete: DeleteTeamDTO) -> None:
         try:
             self.team_repository.DeleteTeamById(team_to_delete.id)
 

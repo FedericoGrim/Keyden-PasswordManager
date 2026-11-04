@@ -1,18 +1,30 @@
 import uuid
 
-from application.exceptions.sub_account_categories_use_case_exceptions import *
-from application.dto.sub_account_categories_dto import *
+from application.exceptions.sub_account_categories_use_case_exceptions import (
+    CreateSubAccountCategoryException,
+    SubAccountCategoryDeletionException,
+    SubAccountCategoryRetrievalException,
+)
+from application.dto.sub_account_categories_dto import (
+    CreateSubAccountCategoryDTO,
+    SubAccountCategoriesDTO,
+)
 
 from domain.interfaces.isub_account_categories_service import (
     ISubAccountCategoriesService,
 )
+from domain.entities.sub_account_categories import SubAccountCategories
 
 
 class CreateSubAccountCategoryUseCase:
-    def __init__(self, SubAccountCategoriesRepository: ISubAccountCategoriesService):
+    def __init__(
+        self, SubAccountCategoriesRepository: ISubAccountCategoriesService
+    ) -> None:
         self.SubAccountCategoriesRepository = SubAccountCategoriesRepository
 
-    def execute(self, new_subacc_category: CreateSubAccountCategoryDTO):
+    def execute(
+        self, new_subacc_category: CreateSubAccountCategoryDTO
+    ) -> SubAccountCategories:
         try:
             result = self.SubAccountCategoriesRepository.CreateSubAccountCategory(
                 new_subacc_category.to_entity()
@@ -25,7 +37,9 @@ class CreateSubAccountCategoryUseCase:
 
 
 class GetAllCategoriesBySubAccountIdUseCase:
-    def __init__(self, SubAccountCategoriesRepository: ISubAccountCategoriesService):
+    def __init__(
+        self, SubAccountCategoriesRepository: ISubAccountCategoriesService
+    ) -> None:
         self.SubAccountCategoriesRepository = SubAccountCategoriesRepository
 
     def execute(self, subaccountId: uuid.UUID) -> list[SubAccountCategoriesDTO]:
@@ -47,7 +61,9 @@ class GetAllCategoriesBySubAccountIdUseCase:
 
 
 class DeleteSubAccountCategoryUseCase:
-    def __init__(self, SubAccountCategoriesRepository: ISubAccountCategoriesService):
+    def __init__(
+        self, SubAccountCategoriesRepository: ISubAccountCategoriesService
+    ) -> None:
         self.SubAccountCategoriesRepository = SubAccountCategoriesRepository
 
     def execute(self, subacc_category: SubAccountCategoriesDTO) -> bool:

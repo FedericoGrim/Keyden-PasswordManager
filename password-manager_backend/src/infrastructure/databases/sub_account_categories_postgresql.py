@@ -3,7 +3,14 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.sub_account_categories_postgresql_exceptions import *
+from infrastructure.exceptions.sub_account_categories_postgresql_exceptions import (
+    GetAllCategoriesBySubAccountIdNotFoundException,
+    SubAccountCategoryAlreadyExistsException,
+    SubAccountCategoryCreationFailedException,
+    SubAccountCategoryDeletionFailedException,
+    SubAccountCategoryNotFoundException,
+    SubAccountCategoryRetrievalException,
+)
 
 from domain.interfaces.isub_account_categories_service import (
     ISubAccountCategoriesService,
@@ -23,7 +30,7 @@ def _to_domain(model: SubAccountCategoriesModel) -> SubAccountCategories:
 
 
 class SubAccountCategoriesService(ISubAccountCategoriesService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.Db = db
 
     def CreateSubAccountCategory(
@@ -42,7 +49,7 @@ class SubAccountCategoriesService(ISubAccountCategoriesService):
 
         except IntegrityError:
             raise SubAccountCategoryAlreadyExistsException(
-                "SubAccountCategory with the same subaccount and category already exists."
+                "SubAccountCategory with the same subaccount and category already exists."  # noqa: E501
             )
 
         except Exception as e:

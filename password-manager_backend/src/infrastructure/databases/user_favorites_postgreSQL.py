@@ -3,7 +3,6 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.user_favorites_postgreSQL_exceptions import *
 
 from domain.interfaces.user_favorite_service_interface import IUserFavoriteService
 from domain.entities.user_favorite import UserFavorite
@@ -19,7 +18,7 @@ def _to_domain(model: UserFavoriteModel) -> UserFavorite:
 
 
 class UserFavoritesService(IUserFavoriteService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.Db = db
 
     def add_favorite(self, new_favorite: UserFavorite) -> UserFavorite:

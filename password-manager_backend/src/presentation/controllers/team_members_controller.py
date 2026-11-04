@@ -108,7 +108,7 @@ async def api_remove_member_from_team(
     team_member_to_delete: RemoveTeamMemberDTO,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> dict[str, str]:
     container: Container = request.app.state.container
     remove_member_use_case = container.team_members().RemoveMemberFromTeamProvider(
         TeamMembersRepository__db=db,

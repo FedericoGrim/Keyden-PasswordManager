@@ -123,7 +123,7 @@ async def api_remove_user_teams_key(
     key_to_delete: RemoveUserTeamKeyDTO,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> dict[str, str]:
     container: Container = request.app.state.container
     remove_key_use_case = container.user_teams_keys().RemoveUserTeamKeyProvider(
         UserTeamKeyRepository__db=db,

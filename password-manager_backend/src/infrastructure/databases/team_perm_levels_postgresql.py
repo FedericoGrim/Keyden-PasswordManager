@@ -3,7 +3,15 @@ from sqlalchemy.exc import IntegrityError
 import uuid
 import logging
 
-from infrastructure.exceptions.team_perm_levels_postgresql_exceptions import *
+from infrastructure.exceptions.team_perm_levels_postgresql_exceptions import (
+    GetAllTeamPermLevelsByTeamIdNotFoundException,
+    TeamPermLevelAlreadyExistsException,
+    TeamPermLevelCreationFailedException,
+    TeamPermLevelDeletionException,
+    TeamPermLevelNotFoundException,
+    TeamPermLevelRetrievalException,
+    TeamPermLevelUpdateException,
+)
 
 from domain.interfaces.team_perm_level_service_interface import ITeamPermLevelService
 from domain.entities.team_perm_level import TeamPermLevel
@@ -20,7 +28,7 @@ def _to_domain(model: TeamPermLevelModel) -> TeamPermLevel:
 
 
 class TeamPermLevelsService(ITeamPermLevelService):
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.Db = db
 
     def CreateTeamPermLevel(self, perm_level: TeamPermLevel) -> TeamPermLevel:

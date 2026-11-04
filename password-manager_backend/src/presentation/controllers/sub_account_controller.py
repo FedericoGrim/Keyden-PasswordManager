@@ -7,6 +7,7 @@ from config import Container
 
 from infrastructure.databases.database import get_db
 
+from domain.entities.sub_account import SubAccount
 from application.dto.sub_account_dto import (
     CreateSubAccountDTO,
     UpdateSubAccountDTO,
@@ -24,7 +25,7 @@ async def CreateSubAccount(
     subaccountObj: CreateSubAccountDTO,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> dict[str, str] | None:
     container: Container = request.app.state.container
     create_subaccount_use_case = container.subaccount().CreateSubAccountProvider(
         SubAccountRepository__db=db,
@@ -46,7 +47,7 @@ async def GetSubAccountById(
     subaccount_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-) -> dict[str, str | SubAccountDTO]:
+) -> dict[str, str | SubAccount]:
     container: Container = request.app.state.container
     get_subaccount_use_case = container.subaccount().GetSubAccountByIdProvider(
         SubAccountRepository__db=db,
@@ -90,7 +91,7 @@ async def UpdateSubAccountById(
     updated_data: UpdateSubAccountDTO,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> dict[str, str] | None:
     container: Container = request.app.state.container
     update_subaccount_use_case = container.subaccount().UpdateSubAccountByIdProvider(
         SubAccountRepository__db=db,
@@ -110,7 +111,7 @@ async def DeleteSubAccount(
     subaccount_id: UUID4,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> dict[str, str] | None:
     container: Container = request.app.state.container
     delete_subaccount_use_case = container.subaccount().DeleteSubAccountByIdProvider(
         SubAccountRepository__db=db,
@@ -131,7 +132,7 @@ async def RotateSubAccountDeks(
     rotation: RotateSubAccountDeksDTO,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> dict[str, str]:
     container: Container = request.app.state.container
     rotate_deks_use_case = container.subaccount().RotateSubAccountDeksProvider(
         SubAccountRepository__db=db,

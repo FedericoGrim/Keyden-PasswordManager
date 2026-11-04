@@ -6,7 +6,12 @@ from application.dto.user_dto import (
     UserDTO,
     UserPublicDTO,
 )
-from application.exceptions.user_use_Case_exceptions import *
+from application.exceptions.user_use_Case_exceptions import (
+    UserCreationException,
+    UserDeletionException,
+    UserRetrievalException,
+    UserUpdateException,
+)
 
 from domain.interfaces.user_service_interface import IUserService
 from domain.interfaces.team_service_interface import ITeamService
@@ -31,7 +36,7 @@ class CreateUserUseCase:
         TeamPermLevelRepository: ITeamPermLevelService,
         TeamMembersRepository: ITeamMembersService,
         UserTeamKeyRepository: IUserTeamKeyService,
-    ):
+    ) -> None:
         self.user_repository = UserRepository
         self.team_repository = TeamRepository
         self.team_perm_level_repository = TeamPermLevelRepository
@@ -48,22 +53,22 @@ class CreateUserUseCase:
             )
             owner_perm_level = self.team_perm_level_repository.CreateTeamPermLevel(
                 TeamPermLevel(
-                    team_id=personal_team.id,
+                    team_id=uuid.UUID(str(personal_team.id)),
                     name=PERSONAL_TEAM_OWNER_PERM_LEVEL_NAME,
                     rank=PERSONAL_TEAM_OWNER_PERM_LEVEL_RANK,
                 )
             )
             self.team_members_repository.add_member_to_team(
                 TeamMember(
-                    team_id=personal_team.id,
-                    user_id=user.id,
-                    perm_level_id=owner_perm_level.id,
+                    team_id=uuid.UUID(str(personal_team.id)),
+                    user_id=uuid.UUID(str(user.id)),
+                    perm_level_id=uuid.UUID(str(owner_perm_level.id)),
                 )
             )
             self.user_teams_keys_repository.add_key(
                 UserTeamKey(
-                    user_id=user.id,
-                    team_id=personal_team.id,
+                    user_id=uuid.UUID(str(user.id)),
+                    team_id=uuid.UUID(str(personal_team.id)),
                     team_key_encrypted=user_create.team_key_encrypted,
                 )
             )
@@ -75,7 +80,7 @@ class CreateUserUseCase:
 
 
 class GetUserByKeycloakIdUseCase:
-    def __init__(self, UserRepository: IUserService):
+    def __init__(self, UserRepository: IUserService) -> None:
         self.user_repository = UserRepository
 
     def execute(self, main_user_id: uuid.UUID) -> UserDTO:
@@ -88,7 +93,7 @@ class GetUserByKeycloakIdUseCase:
 
 
 class GetUserByUsernameAndCodeUseCase:
-    def __init__(self, UserRepository: IUserService):
+    def __init__(self, UserRepository: IUserService) -> None:
         self.user_repository = UserRepository
 
     def execute(self, username: str, code: str) -> UserPublicDTO:
@@ -101,7 +106,7 @@ class GetUserByUsernameAndCodeUseCase:
 
 
 class GetUserByIdUseCase:
-    def __init__(self, UserRepository: IUserService):
+    def __init__(self, UserRepository: IUserService) -> None:
         self.user_repository = UserRepository
 
     def execute(self, user_id: uuid.UUID) -> UserPublicDTO:
@@ -114,7 +119,7 @@ class GetUserByIdUseCase:
 
 
 class UpdateUserByIdUseCase:
-    def __init__(self, UserRepository: IUserService):
+    def __init__(self, UserRepository: IUserService) -> None:
         self.user_repository = UserRepository
 
     async def execute(self, user_id: uuid.UUID, new_user: UpdateUserDTO) -> UserDTO:
@@ -130,10 +135,10 @@ class UpdateUserByIdUseCase:
 
 
 class DeleteUserByIdUseCase:
-    def __init__(self, UserRepository: IUserService):
+    def __init__(self, UserRepository: IUserService) -> None:
         self.user_repository = UserRepository
 
-    async def execute(self, user_id: uuid.UUID):
+    async def execute(self, user_id: uuid.UUID) -> dict[str, str]:
         try:
             deleted = self.user_repository.delete_user_by_id(user_id)
 

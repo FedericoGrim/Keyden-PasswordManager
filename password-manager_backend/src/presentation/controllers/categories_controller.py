@@ -6,6 +6,7 @@ from config import Container
 
 from infrastructure.databases.database import get_db
 
+from domain.entities.categories import Category
 from application.dto.categories_dto import (
     CreateCategoryDTO,
     UpdateCategoryDTO,
@@ -21,7 +22,7 @@ async def CreateCategory(
     user_interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-) -> tuple[str, CategoryDTO]:
+) -> tuple[str, Category]:
     container: Container = request.app.state.container
     create_category_use_case = container.categories().CreateCategoriesProvider(
         CategoriesRepository__db=db,
@@ -41,7 +42,7 @@ async def GetAllCategoriesByTeamId(
     team_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> tuple[str, list[CategoryDTO]]:
     container: Container = request.app.state.container
     get_categories_use_case = container.categories().GetAllCategoriesByTeamIdProvider(
         CategoriesRepository__db=db,
@@ -61,7 +62,7 @@ async def UpdateCategoryById(
     interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> tuple[str, CategoryDTO]:
     container: Container = request.app.state.container
     update_category_use_case = container.categories().UpdateCategoryByIdProvider(
         CategoriesRepository__db=db,
@@ -84,7 +85,7 @@ async def DeleteCategory(
     user_interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> dict[str, str] | None:
     container: Container = request.app.state.container
     delete_category_use_case = container.categories().DeleteCategoryByIdProvider(
         CategoriesRepository__db=db,

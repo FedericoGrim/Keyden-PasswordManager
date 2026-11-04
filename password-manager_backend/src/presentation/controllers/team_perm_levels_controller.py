@@ -6,10 +6,12 @@ from config import Container
 
 from infrastructure.databases.database import get_db
 
+from domain.entities.team_perm_level import TeamPermLevel
 from application.dto.team_perm_levels_dto import (
     CreateTeamPermLevelDTO,
     UpdateTeamPermLevelDTO,
 )
+from application.dto.team_perm_levels_dto import TeamPermLevelDTO
 
 router = APIRouter()
 
@@ -20,7 +22,7 @@ async def CreateTeamPermLevel(
     user_interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> tuple[str, TeamPermLevel]:
     container: Container = request.app.state.container
     create_perm_level_use_case = (
         container.team_perm_levels().CreateTeamPermLevelProvider(
@@ -42,7 +44,7 @@ async def GetTeamPermLevelById(
     perm_level_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> tuple[str, TeamPermLevelDTO]:
     container: Container = request.app.state.container
     get_perm_level_use_case = container.team_perm_levels().GetTeamPermLevelByIdProvider(
         TeamPermLevelRepository__db=db,
@@ -60,7 +62,7 @@ async def GetAllTeamPermLevelsByTeamId(
     team_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> tuple[str, list[TeamPermLevelDTO]]:
     container: Container = request.app.state.container
     get_perm_levels_use_case = (
         container.team_perm_levels().GetAllTeamPermLevelsByTeamIdProvider(
@@ -82,7 +84,7 @@ async def UpdateTeamPermLevelById(
     interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> tuple[str, TeamPermLevelDTO]:
     container: Container = request.app.state.container
     update_perm_level_use_case = (
         container.team_perm_levels().UpdateTeamPermLevelByIdProvider(
@@ -107,7 +109,7 @@ async def DeleteTeamPermLevel(
     user_interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> dict[str, str] | None:
     container: Container = request.app.state.container
     delete_perm_level_use_case = (
         container.team_perm_levels().DeleteTeamPermLevelByIdProvider(
