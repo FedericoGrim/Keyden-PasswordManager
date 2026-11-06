@@ -143,20 +143,12 @@ class TestMembershipRules:
         with pytest.raises(AccessDenied):
             policy.require_can_add_member(stranger, empty_team, member)
 
-    def test_owner_or_self_member_row(
-        self, policy: AccessPolicy, reader: FakeAccessReader
-    ) -> None:
-        row = uuid.uuid4()
-        reader.member_rows[row] = (team, member)
-        policy.require_owner_or_self_member_row(owner, team, row)
-        policy.require_owner_or_self_member_row(member, team, row)
+    def test_owner_or_self(self, policy: AccessPolicy) -> None:
+        policy.require_owner_or_self(owner, team, member)
+        policy.require_owner_or_self(member, team, member)
         with pytest.raises(AccessDenied):
-            policy.require_owner_or_self_member_row(stranger, team, row)
-
-    def test_member_row_must_belong_to_team(
-        self, policy: AccessPolicy, reader: FakeAccessReader
-    ) -> None:
-        row = uuid.uuid4()
-        reader.member_rows[row] = (uuid.uuid4(), member)
+            policy.require_owner_or_self(stranger, team, member)
         with pytest.raises(AccessDenied):
-            policy.require_owner_or_self_member_row(owner, team, row)
+            policy.require_owner_or_self(member, team, owner)
+        with pytest.raises(AccessDenied):
+            policy.require_owner_or_self(stranger, team, stranger)

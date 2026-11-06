@@ -162,7 +162,8 @@ async def api_remove_member_from_team(
             or team_member_to_delete.member_id != member_id
         ):
             raise AccessDenied()
-        policy.require_owner_or_self_member_row(current_user.id, team_id, member_id)
+        # member_id is the user id here: the repository removes by (user_id, team_id)
+        policy.require_owner_or_self(current_user.id, team_id, member_id)
     except AccessDenied:
         raise forbidden()
     container: Container = request.app.state.container

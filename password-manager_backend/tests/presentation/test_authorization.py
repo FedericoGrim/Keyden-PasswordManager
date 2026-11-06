@@ -95,8 +95,8 @@ ENDPOINTS: list[tuple[str, str, Optional[dict[str, Any]], str]] = [
     ),
     (
         "DELETE",
-        f"/api/team-members/{T}/members/{MR}",
-        {"member_id": str(MR), "team_id": str(T)},
+        f"/api/team-members/{T}/members/{MEMBER}",
+        {"member_id": str(MEMBER), "team_id": str(T)},
         "member",
     ),
     (

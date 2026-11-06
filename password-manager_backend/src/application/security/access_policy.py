@@ -102,11 +102,10 @@ class AccessPolicy:
             return
         self.require_owner(caller_id, team_id)
 
-    def require_owner_or_self_member_row(
-        self, caller_id: uuid.UUID, team_id: uuid.UUID, member_id: uuid.UUID
+    def require_owner_or_self(
+        self, caller_id: uuid.UUID, team_id: uuid.UUID, target_user_id: uuid.UUID
     ) -> None:
-        row = self.reader.member_row(member_id)
-        if row is None or row[0] != team_id:
-            raise AccessDenied()
-        if row[1] != caller_id:
+        if target_user_id == caller_id:
+            self.require_member(caller_id, team_id)
+        else:
             self.require_owner(caller_id, team_id)
