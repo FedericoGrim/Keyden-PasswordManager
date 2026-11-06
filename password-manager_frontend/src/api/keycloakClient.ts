@@ -1,30 +1,13 @@
-import Keycloak, { KeycloakTokenParsed } from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import axiosClient from './axiosClient';
 import { getEnvVar, getIntEnvVar } from './envVars';
 
 let keycloak: Keycloak | null = null;
 
-const logTokenDetails = (tokenParsed: KeycloakTokenParsed | undefined) => {
-  if (tokenParsed) {
-    console.log(`Token details:
-      exp: ${tokenParsed.exp}
-      iat: ${tokenParsed.iat}
-      jti: ${tokenParsed.jti}
-      token: ${keycloak?.token}
-      ...other details: ${JSON.stringify(tokenParsed)}
-    `);
-  } else {
-    console.log('No token details available.');
-  }
-};
-
 const refreshKeycloakToken = async () => {
   if (keycloak) {
     try {
-      const refreshed = await keycloak.updateToken(60);
-      if (refreshed) {
-        logTokenDetails(keycloak.tokenParsed);
-      }
+      await keycloak.updateToken(60);
     } catch (error) {
       console.error('Failed to refresh token:', error);
       keycloak?.logout();
@@ -56,7 +39,6 @@ const keycloakFactory = (): Keycloak => {
     // wiping the in-memory vault on what looked like ordinary navigation.
     keycloak.init({ onLoad: 'login-required', checkLoginIframe: false }).then((authenticated) => {
       if (authenticated) {
-        logTokenDetails(keycloak?.tokenParsed);
         setInterval(refreshKeycloakToken, refreshInterval); 
       }
     });
