@@ -28,6 +28,7 @@ from presentation.controllers.sub_account_history_controller import (
 )
 
 from infrastructure.databases.database import SessionLocal
+from infrastructure.settings import api_docs_enabled
 
 from dotenv import load_dotenv
 import os
@@ -66,7 +67,12 @@ container.wire(
     ]
 )
 
-app = FastAPI()
+docs_enabled = api_docs_enabled(os.getenv("DEBUG"))
+app = FastAPI(
+    docs_url="/docs" if docs_enabled else None,
+    redoc_url="/redoc" if docs_enabled else None,
+    openapi_url="/openapi.json" if docs_enabled else None,
+)
 
 app.add_middleware(
     CORSMiddleware,
