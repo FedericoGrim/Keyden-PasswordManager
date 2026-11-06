@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import String, UUID, ForeignKey
+from sqlalchemy import String, Text, UUID, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from infrastructure.databases.base import Base
@@ -18,10 +18,10 @@ class SubAccountModel(Base):
     team_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("teams.id", ondelete="CASCADE"), nullable=False
     )
-    username_encrypted: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    email_encrypted: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    username_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    email_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
     password_encrypted: Mapped[str] = mapped_column(String, nullable=False)
-    site_link_encrypted: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    site_link_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
     required_perm_level_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("team_perm_levels.id", ondelete="CASCADE"),
