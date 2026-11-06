@@ -4,6 +4,13 @@ import uuid
 from pydantic import UUID4
 
 from config import Container
+from application.security.access_policy import AccessDenied, AccessPolicy
+from presentation.security.dependencies import (
+    CurrentUser,
+    forbidden,
+    get_access_policy,
+    get_current_user,
+)
 
 from infrastructure.databases.database import get_db
 
@@ -21,11 +28,21 @@ router = APIRouter()
 
 @router.post("/{team_id}")
 async def CreateSubAccount(
-    interactor_id: uuid.UUID,
+    team_id: uuid.UUID,
     subaccountObj: CreateSubAccountDTO,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str] | None:
+    interactor_id = current_user.id
+    try:
+        if subaccountObj.team_id != team_id:
+            raise AccessDenied()
+        policy.require_member(current_user.id, team_id)
+        policy.require_perm_level_in_team(subaccountObj.required_perm_level_id, team_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     create_subaccount_use_case = container.subaccount().CreateSubAccountProvider(
         SubAccountRepository__db=db,
@@ -47,7 +64,13 @@ async def GetSubAccountById(
     subaccount_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str | SubAccount]:
+    try:
+        policy.require_member_of_sub_account(current_user.id, subaccount_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     get_subaccount_use_case = container.subaccount().GetSubAccountByIdProvider(
         SubAccountRepository__db=db,
@@ -68,7 +91,13 @@ async def GetAllSubAccountsByTeamId(
     team_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str | list[SubAccountDTO]]:
+    try:
+        policy.require_member(current_user.id, team_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     get_subaccounts_use_case = container.subaccount().GetAllSubAccountsByTeamIdProvider(
         SubAccountRepository__db=db,
@@ -86,12 +115,24 @@ async def GetAllSubAccountsByTeamId(
 
 @router.put("/{subaccount_id}")
 async def UpdateSubAccountById(
-    interactor_id: uuid.UUID,
     subaccount_id: uuid.UUID,
     updated_data: UpdateSubAccountDTO,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str] | None:
+    interactor_id = current_user.id
+    try:
+        if updated_data.id != subaccount_id:
+            raise AccessDenied()
+        team_id = policy.require_member_of_sub_account(current_user.id, subaccount_id)
+        if updated_data.required_perm_level_id is not None:
+            policy.require_perm_level_in_team(
+                updated_data.required_perm_level_id, team_id
+            )
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     update_subaccount_use_case = container.subaccount().UpdateSubAccountByIdProvider(
         SubAccountRepository__db=db,
@@ -107,11 +148,17 @@ async def UpdateSubAccountById(
 
 @router.delete("/{subaccount_id}")
 async def DeleteSubAccount(
-    interactor_id: uuid.UUID,
     subaccount_id: UUID4,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str] | None:
+    interactor_id = current_user.id
+    try:
+        policy.require_member_of_sub_account(current_user.id, subaccount_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     delete_subaccount_use_case = container.subaccount().DeleteSubAccountByIdProvider(
         SubAccountRepository__db=db,
@@ -127,12 +174,18 @@ async def DeleteSubAccount(
 
 @router.put("/team/{team_id}/rotate-deks")
 async def RotateSubAccountDeks(
-    interactor_id: uuid.UUID,
     team_id: uuid.UUID,
     rotation: RotateSubAccountDeksDTO,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str]:
+    interactor_id = current_user.id
+    try:
+        policy.require_owner(current_user.id, team_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     rotate_deks_use_case = container.subaccount().RotateSubAccountDeksProvider(
         SubAccountRepository__db=db,

@@ -3,6 +3,13 @@ from sqlalchemy.orm import Session
 import uuid
 
 from config import Container
+from application.security.access_policy import AccessDenied, AccessPolicy
+from presentation.security.dependencies import (
+    CurrentUser,
+    forbidden,
+    get_access_policy,
+    get_current_user,
+)
 
 from infrastructure.databases.database import get_db
 
@@ -18,11 +25,20 @@ router = APIRouter()
 
 @router.post("/{team_id}")
 async def CreateCategory(
+    team_id: uuid.UUID,
     new_category: CreateCategoryDTO,
-    user_interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> tuple[str, Category]:
+    user_interactor_id = current_user.id
+    try:
+        if new_category.team_id != team_id:
+            raise AccessDenied()
+        policy.require_member(current_user.id, team_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     create_category_use_case = container.categories().CreateCategoriesProvider(
         CategoriesRepository__db=db,
@@ -42,7 +58,13 @@ async def GetAllCategoriesByTeamId(
     team_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> tuple[str, list[CategoryDTO]]:
+    try:
+        policy.require_member(current_user.id, team_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     get_categories_use_case = container.categories().GetAllCategoriesByTeamIdProvider(
         CategoriesRepository__db=db,
@@ -59,10 +81,16 @@ async def GetAllCategoriesByTeamId(
 async def UpdateCategoryById(
     category_id: uuid.UUID,
     updated_data: UpdateCategoryDTO,
-    interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> tuple[str, CategoryDTO]:
+    interactor_id = current_user.id
+    try:
+        policy.require_member_of_category(current_user.id, category_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     update_category_use_case = container.categories().UpdateCategoryByIdProvider(
         CategoriesRepository__db=db,
@@ -82,10 +110,16 @@ async def UpdateCategoryById(
 @router.delete("/{category_id}")
 async def DeleteCategory(
     category_id: uuid.UUID,
-    user_interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str] | None:
+    user_interactor_id = current_user.id
+    try:
+        policy.require_member_of_category(current_user.id, category_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     delete_category_use_case = container.categories().DeleteCategoryByIdProvider(
         CategoriesRepository__db=db,

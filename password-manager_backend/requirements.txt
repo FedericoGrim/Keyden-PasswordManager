@@ -24,6 +24,7 @@ dependency_injector
 #Testing
 pytest
 pytest-asyncio
+httpx2
 
 #Type checking & linting
 pyright

@@ -3,6 +3,13 @@ from fastapi import APIRouter, HTTPException, Depends, Request
 from sqlalchemy.orm import Session
 
 from config import Container
+from application.security.access_policy import AccessDenied, AccessPolicy
+from presentation.security.dependencies import (
+    CurrentUser,
+    forbidden,
+    get_access_policy,
+    get_current_user,
+)
 
 from application.dto.team_dto import (
     TeamDTO,
@@ -19,11 +26,13 @@ router = APIRouter()
 # -------------------- CREATE --------------------
 @router.post("/")
 async def ApiCreateTeam(
-    user_interactor_id: uuid.UUID,
     team: CreateTeamDTO,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str]:
+    user_interactor_id = current_user.id
     container: Container = request.app.state.container
     create_team_use_case = container.team().CreateTeamProvider(
         TeamRepository__db=db,
@@ -42,7 +51,13 @@ async def ApiGetTeamById(
     team_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str | TeamDTO]:
+    try:
+        policy.require_member(current_user.id, team_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     get_team_use_case = container.team().GetTeamByIdProvider(TeamRepository__db=db)
 
@@ -58,7 +73,13 @@ async def ApiGetTeamsByUserId(
     user_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str | list[TeamDTO]]:
+    try:
+        policy.require_self(current_user.id, user_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     get_teams_use_case = container.team().GetTeamsByUserIdProvider(
         TeamRepository__db=db
@@ -74,11 +95,20 @@ async def ApiGetTeamsByUserId(
 # -------------------- UPDATE --------------------
 @router.put("/{team_id}")
 async def ApiUpdateTeam(
-    user_interactor_id: uuid.UUID,
+    team_id: uuid.UUID,
     new_team_data: UpdateTeamDTO,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str | TeamDTO]:
+    user_interactor_id = current_user.id
+    try:
+        if new_team_data.id != team_id:
+            raise AccessDenied()
+        policy.require_owner(current_user.id, team_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     update_team_use_case = container.team().UpdateTeamByIdProvider(
         TeamRepository__db=db,
@@ -94,11 +124,20 @@ async def ApiUpdateTeam(
 # -------------------- DELETE --------------------
 @router.delete("/{team_id}")
 async def ApiDeleteTeam(
-    interactor_id: uuid.UUID,
+    team_id: uuid.UUID,
     team_to_delete: DeleteTeamDTO,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str]:
+    interactor_id = current_user.id
+    try:
+        if team_to_delete.id != team_id:
+            raise AccessDenied()
+        policy.require_owner(current_user.id, team_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     delete_team_use_case = container.team().DeleteTeamByIdProvider(
         TeamRepository__db=db,
