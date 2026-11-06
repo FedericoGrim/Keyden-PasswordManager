@@ -57,6 +57,7 @@ class UpdateSubAccountDTO(BaseModel):
 
     def to_entity(self, existing_sub_account: SubAccount) -> SubAccount:
         return SubAccount(
+            id=existing_sub_account.id,
             team_id=existing_sub_account.team_id,
             username_encrypted=self.username_encrypted
             if self.username_encrypted is not None
