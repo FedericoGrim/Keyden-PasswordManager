@@ -3,6 +3,13 @@ from sqlalchemy.orm import Session
 import uuid
 
 from config import Container
+from application.security.access_policy import AccessDenied, AccessPolicy
+from presentation.security.dependencies import (
+    CurrentUser,
+    forbidden,
+    get_access_policy,
+    get_current_user,
+)
 
 from infrastructure.databases.database import get_db
 
@@ -18,11 +25,20 @@ router = APIRouter()
 
 @router.post("/{team_id}")
 async def CreateTeamPermLevel(
+    team_id: uuid.UUID,
     new_perm_level: CreateTeamPermLevelDTO,
-    user_interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> tuple[str, TeamPermLevel]:
+    user_interactor_id = current_user.id
+    try:
+        if new_perm_level.team_id != team_id:
+            raise AccessDenied()
+        policy.require_owner_or_empty_team(current_user.id, team_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     create_perm_level_use_case = (
         container.team_perm_levels().CreateTeamPermLevelProvider(
@@ -44,7 +60,13 @@ async def GetTeamPermLevelById(
     perm_level_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> tuple[str, TeamPermLevelDTO]:
+    try:
+        policy.require_member_of_perm_level(current_user.id, perm_level_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     get_perm_level_use_case = container.team_perm_levels().GetTeamPermLevelByIdProvider(
         TeamPermLevelRepository__db=db,
@@ -62,7 +84,13 @@ async def GetAllTeamPermLevelsByTeamId(
     team_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> tuple[str, list[TeamPermLevelDTO]]:
+    try:
+        policy.require_member(current_user.id, team_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     get_perm_levels_use_case = (
         container.team_perm_levels().GetAllTeamPermLevelsByTeamIdProvider(
@@ -81,10 +109,16 @@ async def GetAllTeamPermLevelsByTeamId(
 async def UpdateTeamPermLevelById(
     perm_level_id: uuid.UUID,
     updated_data: UpdateTeamPermLevelDTO,
-    interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> tuple[str, TeamPermLevelDTO]:
+    interactor_id = current_user.id
+    try:
+        policy.require_owner_of_perm_level(current_user.id, perm_level_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     update_perm_level_use_case = (
         container.team_perm_levels().UpdateTeamPermLevelByIdProvider(
@@ -106,10 +140,16 @@ async def UpdateTeamPermLevelById(
 @router.delete("/{perm_level_id}")
 async def DeleteTeamPermLevel(
     perm_level_id: uuid.UUID,
-    user_interactor_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+    policy: AccessPolicy = Depends(get_access_policy),
 ) -> dict[str, str] | None:
+    user_interactor_id = current_user.id
+    try:
+        policy.require_owner_of_perm_level(current_user.id, perm_level_id)
+    except AccessDenied:
+        raise forbidden()
     container: Container = request.app.state.container
     delete_perm_level_use_case = (
         container.team_perm_levels().DeleteTeamPermLevelByIdProvider(

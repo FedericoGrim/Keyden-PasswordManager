@@ -4,6 +4,12 @@ from sqlalchemy.orm import Session
 
 
 from config import Container
+from presentation.security.dependencies import (
+    CurrentUser,
+    forbidden,
+    get_current_user,
+    get_token_subject,
+)
 
 from application.dto.user_dto import (
     CreateUserDTO,
@@ -23,7 +29,10 @@ async def create_user(
     user_data: CreateUserDTO,
     request: Request,
     db: Session = Depends(get_db),
+    token_subject: uuid.UUID = Depends(get_token_subject),
 ) -> dict[str, str | UserDTO]:
+    if user_data.keycloak_id != token_subject:
+        raise forbidden()
     container: Container = request.app.state.container
     create_user_use_case = container.user().CreateUserProvider(
         UserRepository__db=db,
@@ -45,7 +54,10 @@ async def get_user_by_keycloak_id(
     keycloak_user_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    token_subject: uuid.UUID = Depends(get_token_subject),
 ) -> dict[str, str | UserDTO]:
+    if keycloak_user_id != token_subject:
+        raise forbidden()
     container: Container = request.app.state.container
     get_user_use_case = container.user().GetUserByKeycloakIdProvider(
         UserRepository__db=db
@@ -64,6 +76,7 @@ async def get_user_by_username_and_code(
     code: str,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> dict[str, str | UserPublicDTO]:
     container: Container = request.app.state.container
     get_user_use_case = container.user().GetUserByUsernameAndCodeProvider(
@@ -81,6 +94,7 @@ async def get_user_by_id(
     user_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> dict[str, str | UserPublicDTO]:
     container: Container = request.app.state.container
     get_user_use_case = container.user().GetUserByIdProvider(UserRepository__db=db)
@@ -98,7 +112,10 @@ async def update_user_by_id(
     new_user: UpdateUserDTO,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> dict[str, str]:
+    if user_id not in (current_user.id, current_user.keycloak_id):
+        raise forbidden()
     container: Container = request.app.state.container
     update_user_use_case = container.user().UpdateUserByIdProvider(
         UserRepository__db=db,
@@ -118,7 +135,10 @@ async def delete_user_by_id(
     user_id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> dict[str, str]:
+    if user_id not in (current_user.id, current_user.keycloak_id):
+        raise forbidden()
     container: Container = request.app.state.container
     delete_user_use_case = container.user().DeleteUserByIdProvider(
         UserRepository__db=db,
