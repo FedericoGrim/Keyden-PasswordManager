@@ -56,6 +56,23 @@ class TeamMembersService(ITeamMembersService):
             logging.error(f"Error: {e}")
             raise Exception("Failed to retrieve team member by ID.")
 
+    def get_team_member_by_user_and_team(
+        self, user_id: uuid.UUID, team_id: uuid.UUID
+    ) -> TeamMember:
+        try:
+            member_model = (
+                self.Db.query(TeamMemberModel)
+                .filter_by(user_id=user_id, team_id=team_id)
+                .first()
+            )
+            if not member_model:
+                raise Exception("Member not found in the team.")
+            return _to_domain(member_model)
+
+        except Exception as e:
+            logging.error(f"Error: {e}")
+            raise Exception("Failed to retrieve team member.")
+
     def get_members_by_team_id(self, team_id: uuid.UUID) -> list[TeamMember]:
         try:
             member_models = (

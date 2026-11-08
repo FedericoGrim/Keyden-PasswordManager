@@ -112,7 +112,7 @@ class TestUpdateTeamMemberRoleUseCase:
             user_id=existing.user_id,
             perm_level_id=new_perm_level_id,
         )
-        repo.get_team_member_by_id.return_value = existing
+        repo.get_team_member_by_user_and_team.return_value = existing
         repo.update_member_role.return_value = updated
 
         dto = UpdateTeamMemberDTO(
@@ -123,10 +123,12 @@ class TestUpdateTeamMemberRoleUseCase:
         result = UpdateTeamMemberRoleUseCase(repo).execute(uuid.uuid4(), dto)
 
         assert result.perm_level_id == new_perm_level_id
-        repo.get_team_member_by_id.assert_called_once_with(existing.user_id)
+        repo.get_team_member_by_user_and_team.assert_called_once_with(
+            existing.user_id, existing.team_id
+        )
 
     def test_wraps_repository_errors(self, repo: MagicMock) -> None:
-        repo.get_team_member_by_id.side_effect = Exception("missing")
+        repo.get_team_member_by_user_and_team.side_effect = Exception("missing")
         dto = UpdateTeamMemberDTO(
             user_id=uuid.uuid4(), team_id=uuid.uuid4(), perm_level_id=uuid.uuid4()
         )

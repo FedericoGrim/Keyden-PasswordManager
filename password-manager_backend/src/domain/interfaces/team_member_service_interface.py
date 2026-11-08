@@ -15,6 +15,12 @@ class ITeamMembersService(ABC):
         pass
 
     @abstractmethod
+    def get_team_member_by_user_and_team(
+        self, user_id: uuid.UUID, team_id: uuid.UUID
+    ) -> TeamMember:
+        pass
+
+    @abstractmethod
     def get_members_by_team_id(self, team_id: uuid.UUID) -> list[TeamMember]:
         pass
 

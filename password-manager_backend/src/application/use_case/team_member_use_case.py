@@ -89,8 +89,8 @@ class UpdateTeamMemberRoleUseCase:
         try:
             updated_member = self.team_members_repository.update_member_role(
                 new_user_data.to_entity(
-                    self.team_members_repository.get_team_member_by_id(
-                        new_user_data.user_id
+                    self.team_members_repository.get_team_member_by_user_and_team(
+                        new_user_data.user_id, new_user_data.team_id
                     )
                 )
             )
