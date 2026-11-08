@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import String, UUID, ForeignKey, DateTime, func
+from sqlalchemy import String, Text, UUID, ForeignKey, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from infrastructure.databases.base import Base
@@ -21,10 +21,10 @@ class SubAccountHistoryModel(Base):
         ForeignKey("sub_accounts.id", ondelete="CASCADE"),
         nullable=False,
     )
-    username_encrypted: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    email_encrypted: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    username_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    email_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
     password_encrypted: Mapped[str] = mapped_column(String, nullable=False)
-    site_link_encrypted: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    site_link_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
     dek_wrapped: Mapped[str | None] = mapped_column(String, nullable=True)
     changed_by: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
