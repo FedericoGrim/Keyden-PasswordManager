@@ -128,6 +128,16 @@ class TestGetAllSubAccountsByTeamIdUseCase:
         assert {dto.id for dto in result} == {e.id for e in entities}
         assert all(dto.team_id == team_id for dto in result)
 
+    def test_keeps_missing_fields_as_none(self, repo: MagicMock) -> None:
+        team_id = uuid.uuid4()
+        repo.GetAllSubAccountsByTeamId.return_value = [
+            make_sub_account(team_id=team_id, username_encrypted=None)
+        ]
+
+        result = GetAllSubAccountsByTeamIdUseCase(repo).execute(team_id)
+
+        assert result[0].username_encrypted is None
+
     def test_wraps_repository_errors(self, repo: MagicMock) -> None:
         repo.GetAllSubAccountsByTeamId.side_effect = Exception("boom")
 

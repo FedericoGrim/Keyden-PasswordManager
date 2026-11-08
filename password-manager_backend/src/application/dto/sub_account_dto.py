@@ -7,10 +7,10 @@ from domain.entities.sub_account import SubAccount
 class SubAccountDTO(BaseModel):
     id: UUID4
     team_id: UUID4
-    username_encrypted: str
-    email_encrypted: str
+    username_encrypted: Optional[str]
+    email_encrypted: Optional[str]
     password_encrypted: str
-    site_link_encrypted: str
+    site_link_encrypted: Optional[str]
     required_perm_level_id: UUID4
     dek_wrapped: Optional[str] = None
 

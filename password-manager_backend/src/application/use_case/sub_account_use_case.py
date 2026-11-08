@@ -63,10 +63,10 @@ class GetAllSubAccountsByTeamIdUseCase:
                 SubAccountDTO(
                     id=uuid.UUID(str(sub_account.id)),
                     team_id=uuid.UUID(str(sub_account.team_id)),
-                    username_encrypted=str(sub_account.username_encrypted),
-                    email_encrypted=str(sub_account.email_encrypted),
+                    username_encrypted=sub_account.username_encrypted,
+                    email_encrypted=sub_account.email_encrypted,
                     password_encrypted=str(sub_account.password_encrypted),
-                    site_link_encrypted=str(sub_account.site_link_encrypted),
+                    site_link_encrypted=sub_account.site_link_encrypted,
                     required_perm_level_id=uuid.UUID(
                         str(sub_account.required_perm_level_id)
                     ),

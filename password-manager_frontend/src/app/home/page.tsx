@@ -73,13 +73,14 @@ export default function Home() {
   const [categories, setCategories] = useState<category[]>([]);
   const [searchText, setSearchText] = useState("");
   const [gridPage, setGridPage] = useState(1);
+  const [undecryptableCount, setUndecryptableCount] = useState(0);
   const [formTarget, setFormTarget] = useState<DecryptedSubAccount | "new" | null>(null);
 
   const loadFavorites = useCallback(async () => {
     const favorites = await getFavoritesByUserId(vault.user.id);
     setFavoriteIds(new Set(favorites.map((f) => f.sub_account_id)));
 
-    const cards = await Promise.all(
+    const cardResults = await Promise.allSettled(
       favorites.map(async (f) => {
         const sa = await getSubAccountById(f.sub_account_id);
         if (!sa) return null;
@@ -94,7 +95,9 @@ export default function Home() {
         } as FavoriteCard;
       })
     );
-    setFavoriteCards(cards.filter((c): c is FavoriteCard => c !== null));
+    setFavoriteCards(
+      cardResults.flatMap((r) => (r.status === "fulfilled" && r.value !== null ? [r.value] : []))
+    );
   }, [vault.user.id, getTeamAesKey]);
 
   const loadGrid = useCallback(
@@ -102,7 +105,7 @@ export default function Home() {
       const aesKey = await getTeamAesKey(teamId);
       if (!aesKey) return;
       const raw = await getSubAccountsByTeamId(teamId);
-      const decrypted = await Promise.all(
+      const results = await Promise.allSettled(
         raw.map(async (sa) => ({
           id: sa.id,
           ...(await decryptSubAccountFields(sa, aesKey)),
@@ -110,6 +113,11 @@ export default function Home() {
           dekWrapped: sa.dek_wrapped,
         }))
       );
+      const decrypted = results.flatMap((r) => (r.status === "fulfilled" ? [r.value] : []));
+      results.forEach((r, i) => {
+        if (r.status === "rejected") console.error(`Could not decrypt sub-account ${raw[i].id}`);
+      });
+      setUndecryptableCount(results.length - decrypted.length);
       setGridAccounts(decrypted);
       setGridPage(1);
     },
@@ -232,6 +240,11 @@ export default function Home() {
             </div>
 
             <div className="grid">
+              {undecryptableCount > 0 && (
+                <p className="empty-state" role="alert">
+                  {undecryptableCount} {undecryptableCount === 1 ? "entry" : "entries"} could not be decrypted and {undecryptableCount === 1 ? "is" : "are"} hidden.
+                </p>
+              )}
               {visibleGrid.length === 0 && <p className="empty-state">No entries yet.</p>}
               {visibleGrid.map((a) => (
                 <button key={a.id} className="grid-card" onClick={() => setFormTarget(a)}>
